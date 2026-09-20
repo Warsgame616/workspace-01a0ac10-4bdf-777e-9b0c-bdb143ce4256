@@ -112,7 +112,7 @@ $ev = db()->prepare("SELECT e.*, a.nom AS a_nom, a.prenom AS a_prenom, a.societe
                      WHERE e.projet_id=?");
 $ev->execute([$id]);
 $evaluations = $ev->fetchAll();
-$peut_evaluer = ($u['role']==='entreprise' && (int)$p['entreprise_id']===(int)$u['id']
+$peut_evaluer = (est_client($u['role']) && (int)$p['entreprise_id']===(int)$u['id']
                  && $p['statut']==='termine' && $p['freelance_id'] && !$evaluations);
 
 $etapes = ['nouveau'=>0,'analyse'=>1,'attribue'=>2,'en_cours'=>3,'livraison'=>4,'termine'=>5];
@@ -345,7 +345,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="flex-center mb-2">
               <span class="avatar lg"><?= strtoupper(mb_substr($p['f_prenom'],0,1).mb_substr($p['f_nom'],0,1)) ?></span>
               <div>
-                <h4><?= $u['role']==='entreprise'
+                <h4><?= est_client($u['role'])
                       ? e($p['f_prenom'].' '.mb_substr($p['f_nom'],0,1).'.')
                       : e($p['f_prenom'].' '.$p['f_nom']) ?></h4>
                 <p class="small muted"><?= e($p['titre_pro']) ?></p>

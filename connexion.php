@@ -49,18 +49,23 @@ require_once __DIR__ . '/includes/header.php';
 
     <div class="demo-box">
       <h5>Comptes de démonstration — connexion en un clic</h5>
-      <button type="button" class="demo-btn" onclick="fillLogin('entreprise@test.fr','test123')">
-        <span style="font-size:1.125rem">🏢</span>
-        <span><strong>Espace entreprise</strong><span>Nexora Industries — entreprise@test.fr</span></span>
-      </button>
-      <button type="button" class="demo-btn" onclick="fillLogin('marie@freelance.fr','test123')">
-        <span style="font-size:1.125rem">👩‍💻</span>
-        <span><strong>Espace freelance</strong><span>Marie Leroy — marie@freelance.fr</span></span>
-      </button>
-      <button type="button" class="demo-btn" onclick="fillLogin('admin@workconnects.fr','admin123')">
-        <span style="font-size:1.125rem">🛡️</span>
-        <span><strong>Back-office WorkConnects</strong><span>Administration — admin@workconnects.fr</span></span>
-      </button>
+      <?php
+      $demos = [
+        ['🏢', 'Espace entreprise',        'Nexora Industries',     'entreprise@test.fr',      'test123'],
+        ['👩‍💻', 'Espace freelance',         'Marie Leroy',           'marie@freelance.fr',      'test123'],
+        ['🛡️', 'Back-office WorkConnects', 'Administration',        'admin@workconnects.fr',   'admin123'],
+      ];
+      foreach ($demos as $d): ?>
+        <form method="post" style="margin:0">
+          <?= csrf_field() ?>
+          <input type="hidden" name="email" value="<?= e($d[3]) ?>">
+          <input type="hidden" name="password" value="<?= e($d[4]) ?>">
+          <button type="submit" class="demo-btn">
+            <span style="font-size:1.125rem"><?= $d[0] ?></span>
+            <span><strong><?= e($d[1]) ?></strong><span><?= e($d[2]) ?> — <?= e($d[3]) ?></span></span>
+          </button>
+        </form>
+      <?php endforeach; ?>
     </div>
 
     <div class="auth-alt">

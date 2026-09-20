@@ -61,7 +61,7 @@ require_once __DIR__ . '/includes/header.php';
       <span class="avatar lg"><?= initiales($u) ?></span>
       <div>
         <h1 style="font-size:1.5rem"><?= e(trim($u['prenom'].' '.$u['nom'])) ?></h1>
-        <p><?= e($u['role']==='entreprise' ? ($u['societe'] ?: 'Entreprise') : ($u['role']==='freelance' ? $u['titre_pro'] : 'Équipe WorkConnects')) ?> · <?= e($u['email']) ?></p>
+        <p><?= e(est_client($u['role']) ? ($u['societe'] ?: role_label($u['role'])) : ($u['role']==='freelance' ? $u['titre_pro'] : 'Équipe WorkConnects')) ?> · <?= e($u['email']) ?></p>
       </div>
     </div>
   </div>
@@ -86,7 +86,7 @@ require_once __DIR__ . '/includes/header.php';
           </div>
           <div class="field"><label for="telephone">Téléphone</label><input type="tel" id="telephone" name="telephone" class="input" value="<?= e($u['telephone']) ?>"></div>
 
-          <?php if ($u['role']==='entreprise'): ?>
+          <?php if (est_client($u['role'])): ?>
             <div class="field"><label for="societe">Raison sociale</label><input type="text" id="societe" name="societe" class="input" value="<?= e($u['societe']) ?>"></div>
             <div class="field-row">
               <div class="field"><label for="siret">SIRET</label><input type="text" id="siret" name="siret" class="input" value="<?= e($u['siret']) ?>"></div>
@@ -98,18 +98,12 @@ require_once __DIR__ . '/includes/header.php';
             <div class="field"><label for="titre_pro">Titre professionnel</label><input type="text" id="titre_pro" name="titre_pro" class="input" value="<?= e($u['titre_pro']) ?>"></div>
             <div class="field"><label for="bio">Présentation</label><textarea id="bio" name="bio" class="textarea"><?= e($u['bio']) ?></textarea></div>
             <div class="field">
-              <label>Compétences</label>
-              <input type="hidden" id="competences" name="competences" value="<?= e($u['competences']) ?>">
-              <div class="tagbox" data-input="competences">
-                <?php
-                $all = ['PHP','JavaScript','React','Vue','Python','MySQL','API REST','WordPress','Flutter','Swift','Kotlin','Firebase','Figma','UI Design','UX Research','Design System','SEO','Rédaction','Analytics','Content Strategy','SQL','Data Viz'];
-                foreach (array_unique(array_merge($all, array_filter(array_map('trim', explode(',', $u['competences']))))) as $t): ?>
-                  <span class="tag-opt"><?= e($t) ?></span>
-                <?php endforeach; ?>
-              </div>
+              <label>Vos compétences</label>
+              <?php champ_competences($u['competences']); ?>
+              <div class="hint">Elles alimentent directement votre score de matching.</div>
             </div>
             <div class="field-row">
-              <div class="field"><label for="tjm">TJM (€)</label><input type="number" id="tjm" name="tjm" class="input" value="<?= (int)$u['tjm'] ?>"></div>
+              <div class="field"><label for="tjm">Tarif journalier (€ / jour)</label><input type="number" id="tjm" name="tjm" class="input" min="0" step="10" value="<?= (int)$u['tjm'] ?>"></div>
               <div class="field"><label for="experience">Années d'expérience</label><input type="number" id="experience" name="experience" class="input" value="<?= (int)$u['experience'] ?>"></div>
             </div>
             <div class="field">

@@ -50,7 +50,7 @@ function initRoles(){
 
 /* ---------- Tags de compétences ---------- */
 function initTags(){
-  document.querySelectorAll('.tagbox').forEach(function(box){
+  document.querySelectorAll('.tagbox, .skills-box').forEach(function(box){
     var hidden = document.getElementById(box.dataset.input);
     if (!hidden) return;
     var current = hidden.value ? hidden.value.split(',').map(s=>s.trim()).filter(Boolean) : [];

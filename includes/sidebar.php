@@ -9,7 +9,7 @@ if ($u = user()) {
 }
 ?>
 <aside class="sidebar">
-<?php if ($r === 'entreprise'): ?>
+<?php if (est_client($r)): ?>
   <div class="side-label">Pilotage</div>
   <a href="dashboard-entreprise.php" class="side-link <?= $cur==='dashboard-entreprise.php'?'active':'' ?>"><span class="ico">📊</span> Tableau de bord</a>
   <a href="projets.php" class="side-link <?= $cur==='projets.php'?'active':'' ?>"><span class="ico">📁</span> Mes projets</a>

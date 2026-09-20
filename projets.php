@@ -4,7 +4,7 @@ if (!is_logged()) { header('Location: connexion.php'); exit; }
 $u = user();
 $filtre = $_GET['s'] ?? '';
 
-if ($u['role']==='entreprise') {
+if (est_client($u['role'])) {
     $sql = "SELECT p.*, f.nom AS f_nom, f.prenom AS f_prenom FROM projets p LEFT JOIN users f ON f.id=p.freelance_id WHERE p.entreprise_id=?";
 } elseif ($u['role']==='freelance') {
     $sql = "SELECT p.*, e.societe FROM projets p LEFT JOIN users e ON e.id=p.entreprise_id WHERE p.freelance_id=?";
@@ -16,7 +16,7 @@ $sql .= " ORDER BY p.id DESC";
 $st = db()->prepare($sql); $st->execute($args);
 $projets = $st->fetchAll();
 
-$titre = $u['role']==='entreprise' ? "Mes projets" : "Mes missions";
+$titre = est_client($u['role']) ? "Mes projets" : "Mes missions";
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="app">
@@ -28,7 +28,7 @@ require_once __DIR__ . '/includes/header.php';
       <h1><?= e($titre) ?></h1>
       <p><?= count($projets) ?> résultat<?= count($projets)>1?'s':'' ?></p>
     </div>
-    <?php if ($u['role']==='entreprise'): ?>
+    <?php if (est_client($u['role'])): ?>
       <a href="nouveau-projet.php" class="btn btn-primary">➕ Nouveau projet</a>
     <?php endif; ?>
   </div>
@@ -44,7 +44,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="panel"><div class="empty">
       <div class="ico">📁</div><h3>Aucun projet</h3>
       <p>Aucun projet ne correspond à ce filtre.</p>
-      <?php if ($u['role']==='entreprise'): ?><a href="nouveau-projet.php" class="btn btn-primary">Créer un projet</a><?php endif; ?>
+      <?php if (est_client($u['role'])): ?><a href="nouveau-projet.php" class="btn btn-primary">Créer un projet</a><?php endif; ?>
     </div></div>
   <?php else: ?>
     <div class="grid grid-2">

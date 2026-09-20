@@ -15,7 +15,7 @@ require_once __DIR__ . '/includes/header.php';
         et vous garantit un livrable conforme, dans les délais.
       </p>
       <div class="hero-actions">
-        <a href="inscription.php?role=entreprise" class="btn btn-primary btn-lg">Décrire mon projet</a>
+        <a href="inscription.php" class="btn btn-primary btn-lg">Décrire mon projet</a>
         <a href="entreprises.php" class="btn btn-ghost btn-lg">Comment ça marche</a>
       </div>
       <div class="hero-trust">

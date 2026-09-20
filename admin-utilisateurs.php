@@ -36,6 +36,7 @@ require_once __DIR__ . '/includes/header.php';
   <div class="flex gap-1 wrap mb-3">
     <a href="admin-utilisateurs.php" class="btn <?= !$r?'btn-primary':'btn-ghost' ?> btn-sm">Tous</a>
     <a href="admin-utilisateurs.php?r=entreprise" class="btn <?= $r==='entreprise'?'btn-primary':'btn-ghost' ?> btn-sm">Entreprises</a>
+    <a href="admin-utilisateurs.php?r=particulier" class="btn <?= $r==='particulier'?'btn-primary':'btn-ghost' ?> btn-sm">Particuliers</a>
     <a href="admin-utilisateurs.php?r=freelance" class="btn <?= $r==='freelance'?'btn-primary':'btn-ghost' ?> btn-sm">Freelances</a>
     <a href="admin-utilisateurs.php?r=admin" class="btn <?= $r==='admin'?'btn-primary':'btn-ghost' ?> btn-sm">Administration</a>
   </div>
@@ -53,10 +54,10 @@ require_once __DIR__ . '/includes/header.php';
                 <div><div class="t-title"><?= e(trim($x['prenom'].' '.$x['nom'])) ?></div><div class="t-sub"><?= e($x['email']) ?></div></div>
               </div>
             </td>
-            <td><span class="badge <?= $x['role']==='admin'?'badge-violet':($x['role']==='entreprise'?'badge-blue':'badge-gray') ?>"><?= ucfirst($x['role']) ?></span></td>
+            <td><span class="badge <?= $x['role']==='admin'?'badge-violet':(est_client($x['role'])?'badge-blue':'badge-gray') ?>"><?= role_label($x['role']) ?></span></td>
             <td class="small">
-              <?php if ($x['role']==='entreprise'): ?>
-                <?= e($x['societe']) ?><br><span class="muted"><?= e($x['secteur']) ?> · <?= e($x['taille']) ?></span>
+              <?php if (est_client($x['role'])): ?>
+                <?= e($x['societe'] ?: role_label($x['role'])) ?><br><span class="muted"><?= e(trim($x['taille'])) ?: '—' ?></span>
               <?php elseif ($x['role']==='freelance'): ?>
                 <?= e($x['titre_pro']) ?><br><span class="muted">TJM <?= euros($x['tjm']) ?> · <?= (int)$x['experience'] ?> ans · <?= ucfirst($x['disponibilite']) ?></span>
               <?php else: ?><span class="muted">Équipe WorkConnects</span><?php endif; ?>

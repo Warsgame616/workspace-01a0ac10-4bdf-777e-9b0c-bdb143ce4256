@@ -6,7 +6,7 @@ $ADMIN_ID = 1;
 
 /* L'admin discute avec un utilisateur choisi ; les autres discutent uniquement avec WorkConnects */
 if ($u['role'] === 'admin') {
-    $contacts = db()->query("SELECT * FROM users WHERE role IN ('entreprise','freelance') ORDER BY role, nom")->fetchAll();
+    $contacts = db()->query("SELECT * FROM users WHERE role IN ('entreprise','particulier','freelance') ORDER BY role, nom")->fetchAll();
     $cid = (int)($_GET['c'] ?? ($contacts[0]['id'] ?? 0));
 } else {
     $cid = $ADMIN_ID;
@@ -67,7 +67,7 @@ require_once __DIR__ . '/includes/header.php';
             <span class="avatar"><?= initiales($c) ?></span>
             <div class="meta">
               <strong><?= e(trim($c['prenom'].' '.$c['nom'])) ?><?php if($nb):?> <span class="badge badge-red" style="font-size:.625rem"><?= $nb ?></span><?php endif;?></strong>
-              <p><?= e($c['role']==='entreprise' ? ($c['societe'] ?: 'Entreprise') : $c['titre_pro']) ?></p>
+              <p><?= e(est_client($c['role']) ? ($c['societe'] ?: role_label($c['role'])) : $c['titre_pro']) ?></p>
               <p style="font-size:.75rem"><?= e(mb_substr((string)$last, 0, 42)) ?><?= mb_strlen((string)$last)>42?'…':'' ?></p>
             </div>
           </a>
@@ -96,7 +96,7 @@ require_once __DIR__ . '/includes/header.php';
           <strong><?= $u['role']==='admin' ? e(trim($contact['prenom'].' '.$contact['nom'])) : 'WorkConnects' ?></strong>
           <p class="small muted">
             <?= $u['role']==='admin'
-                ? e($contact['role']==='entreprise' ? ($contact['societe'] ?: 'Entreprise') : $contact['titre_pro'])
+                ? e(est_client($contact['role']) ? ($contact['societe'] ?: role_label($contact['role'])) : $contact['titre_pro'])
                 : 'Sophie Dupont — Chargée de compte' ?>
           </p>
         </div>

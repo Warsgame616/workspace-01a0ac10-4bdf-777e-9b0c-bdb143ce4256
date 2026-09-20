@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
-require_role('entreprise');
+require_role(['entreprise','particulier']);
 $u = user();
 $erreur = '';
 
@@ -100,12 +100,7 @@ require_once __DIR__ . '/includes/header.php';
             <h3 class="mb-1">Compétences attendues</h3>
             <p class="small muted mb-3">Si vous ne savez pas, passez cette étape : nous les déterminerons pour vous.</p>
             <div class="field">
-              <input type="hidden" id="competences" name="competences" value="">
-              <div class="tagbox" data-input="competences">
-                <?php foreach (['PHP','JavaScript','React','Vue','Python','MySQL','API REST','WordPress','Flutter','Swift','Kotlin','Firebase','Figma','UI Design','UX Research','Design System','SEO','Rédaction','Analytics','Content Strategy','SQL','Data Viz','Automatisation','Cybersécurité'] as $t): ?>
-                  <span class="tag-opt"><?= $t ?></span>
-                <?php endforeach; ?>
-              </div>
+              <?php champ_competences(''); ?>
               <div class="hint">Cliquez pour sélectionner. Ces compétences alimentent notre moteur de matching.</div>
             </div>
           </div>

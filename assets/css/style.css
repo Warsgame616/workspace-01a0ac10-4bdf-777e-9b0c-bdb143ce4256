@@ -570,3 +570,22 @@ tbody tr:hover{background:#FCFDFE}
 }
 .star-pick label:hover,.star-pick label:hover ~ label,
 .star-pick input:checked ~ label{color:#F59E0B}
+
+/* ============================================
+   Sélecteur de compétences groupé par domaine
+   ============================================ */
+.skills-box{
+  border:1px solid var(--line);border-radius:var(--r);background:#fff;
+  padding:4px 16px 14px;max-height:340px;overflow-y:auto;
+}
+.skills-group{padding-top:14px}
+.skills-group + .skills-group{border-top:1px solid var(--line-2)}
+.skills-title{
+  font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);font-weight:700;margin-bottom:9px;
+}
+.tagbox-inner{display:flex;flex-wrap:wrap;gap:7px}
+
+/* Grille de rôles à 3 colonnes */
+.role-grid-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:600px){ .role-grid-3{grid-template-columns:1fr} }

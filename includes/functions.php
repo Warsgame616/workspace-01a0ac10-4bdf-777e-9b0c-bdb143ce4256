@@ -3,6 +3,18 @@
 require_once __DIR__ . '/db.php';
 
 if (session_status() === PHP_SESSION_NONE) {
+    // En HTTPS (et notamment dans un aperçu embarqué en iframe), les navigateurs
+    // n'acceptent le cookie de session que s'il est marqué SameSite=None; Secure.
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+          || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+          || (($_SERVER['SERVER_PORT'] ?? '') == 443);
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'httponly' => true,
+        'secure'   => $https,
+        'samesite' => $https ? 'None' : 'Lax',
+    ]);
     session_start();
 }
 
@@ -69,11 +81,22 @@ function logout() { $_SESSION = []; session_destroy(); }
 function dashboard_url($role = null) {
     $role = $role ?: role();
     return match ($role) {
-        'admin'      => 'admin.php',
-        'entreprise' => 'dashboard-entreprise.php',
-        'freelance'  => 'dashboard-freelance.php',
-        default      => 'index.php',
+        'admin'                     => 'admin.php',
+        'entreprise', 'particulier' => 'dashboard-entreprise.php',
+        'freelance'                 => 'dashboard-freelance.php',
+        default                     => 'index.php',
     };
+}
+
+/** Un client est une entreprise OU un particulier : même parcours, même espace. */
+function est_client($role = null) {
+    $role = $role ?: role();
+    return in_array($role, ['entreprise', 'particulier'], true);
+}
+
+/** Libellé lisible d'un rôle */
+function role_label($role) {
+    return ['entreprise'=>'Entreprise','particulier'=>'Particulier','freelance'=>'Freelance','admin'=>'Administration'][$role] ?? ucfirst($role);
 }
 
 /* ---------- Données ---------- */
@@ -182,7 +205,7 @@ function calculer_matching($projet) {
 function stats_globales() {
     $d = db();
     return [
-        'entreprises'   => (int)$d->query("SELECT COUNT(*) FROM users WHERE role='entreprise'")->fetchColumn(),
+        'entreprises'   => (int)$d->query("SELECT COUNT(*) FROM users WHERE role IN ('entreprise','particulier')")->fetchColumn(),
         'freelances'    => (int)$d->query("SELECT COUNT(*) FROM users WHERE role='freelance'")->fetchColumn(),
         'projets'       => (int)$d->query("SELECT COUNT(*) FROM projets")->fetchColumn(),
         'en_cours'      => (int)$d->query("SELECT COUNT(*) FROM projets WHERE statut IN ('attribue','en_cours','livraison')")->fetchColumn(),
@@ -273,4 +296,49 @@ function taille_lisible($o) {
     if ($o >= 1048576) return round($o / 1048576, 1) . ' Mo';
     if ($o >= 1024)    return round($o / 1024) . ' Ko';
     return $o . ' o';
+}
+
+/* ============================================
+   Référentiel des compétences, par domaine
+   ============================================ */
+function competences_par_domaine() {
+    return [
+        'Développement Web' => ['PHP','JavaScript','TypeScript','React','Vue','Angular','Node.js','Laravel','Symfony','WordPress','Shopify','HTML/CSS','MySQL','PostgreSQL','API REST'],
+        'Développement Mobile' => ['Flutter','React Native','Swift','Kotlin','iOS','Android','Firebase'],
+        'Design & Création' => ['UI Design','UX Design','UX Research','Design System','Figma','Adobe XD','Photoshop','Illustrator','InDesign','Direction artistique','Identité visuelle','Logo','Charte graphique','Maquettage','Prototypage','Webdesign','Design produit','Motion Design','Illustration','Retouche photo','Print / Édition','Packaging'],
+        'Marketing & Contenu' => ['SEO','SEA / Google Ads','Réseaux sociaux','Community Management','Content Strategy','Rédaction web','Copywriting','Newsletter','Emailing','Analytics','Growth Hacking','Publicité Meta'],
+        'Vidéo & Audio' => ['Montage vidéo','After Effects','Premiere Pro','Animation 2D','Animation 3D','Voix off','Sound Design','Podcast'],
+        'Data & Automatisation' => ['Python','SQL','Data Visualisation','Power BI','Tableau','Excel avancé','Web Scraping','Automatisation','Zapier / Make','Machine Learning'],
+        'Rédaction & Traduction' => ['Rédaction','Correction','Relecture','Traduction anglais','Traduction espagnol','Documentation technique','Storytelling'],
+        'Technique & Sécurité' => ['DevOps','Docker','Linux','Cybersécurité','Audit de sécurité','RGPD','Hébergement','Maintenance','Migration'],
+        'Conseil & Gestion' => ['Gestion de projet','Product Management','Agile / Scrum','Business Plan','Étude de marché','Formation'],
+    ];
+}
+
+/** Liste à plat de toutes les compétences */
+function toutes_competences() {
+    $out = [];
+    foreach (competences_par_domaine() as $liste) { $out = array_merge($out, $liste); }
+    return $out;
+}
+
+/**
+ * Affiche le sélecteur de compétences groupé par domaine.
+ * $selection : chaîne "PHP,Figma" des compétences déjà choisies.
+ */
+function champ_competences($selection = '', $input_id = 'competences') {
+    $sel = array_filter(array_map('trim', explode(',', (string)$selection)));
+    echo '<input type="hidden" id="'.htmlspecialchars($input_id).'" name="'.htmlspecialchars($input_id).'" value="'.htmlspecialchars($selection, ENT_QUOTES).'">';
+    echo '<div class="skills-box" data-input="'.htmlspecialchars($input_id).'">';
+    foreach (competences_par_domaine() as $domaine => $liste) {
+        echo '<div class="skills-group">';
+        echo '<div class="skills-title">'.htmlspecialchars($domaine).'</div>';
+        echo '<div class="tagbox-inner">';
+        foreach ($liste as $c) {
+            $on = in_array($c, $sel, true) ? ' on' : '';
+            echo '<span class="tag-opt'.$on.'">'.htmlspecialchars($c).'</span>';
+        }
+        echo '</div></div>';
+    }
+    echo '</div>';
 }

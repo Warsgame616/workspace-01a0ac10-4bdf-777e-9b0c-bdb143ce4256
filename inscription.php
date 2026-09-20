@@ -3,11 +3,11 @@ require_once __DIR__ . '/includes/functions.php';
 if (is_logged()) { header('Location: ' . dashboard_url()); exit; }
 
 $erreur = '';
-$role_pre = in_array($_GET['role'] ?? '', ['entreprise','freelance'], true) ? $_GET['role'] : 'entreprise';
+$role_pre = in_array($_GET['role'] ?? '', ['entreprise','particulier','freelance'], true) ? $_GET['role'] : 'entreprise';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
-    $role  = in_array($_POST['role'] ?? '', ['entreprise','freelance'], true) ? $_POST['role'] : '';
+    $role  = in_array($_POST['role'] ?? '', ['entreprise','particulier','freelance'], true) ? $_POST['role'] : '';
     $email = strtolower(trim($_POST['email'] ?? ''));
     $pass  = $_POST['password'] ?? '';
     $nom   = trim($_POST['nom'] ?? '');
@@ -63,9 +63,12 @@ require_once __DIR__ . '/includes/header.php';
       <input type="hidden" name="role" id="role" value="<?= e($role_pre) ?>">
 
       <label class="strong small mb-1" style="display:block">Je suis…</label>
-      <div class="role-grid">
+      <div class="role-grid role-grid-3">
         <div class="role-opt <?= $role_pre==='entreprise'?'selected':'' ?>" data-target="role" data-value="entreprise">
           <div class="ico">🏢</div><strong>Une entreprise</strong><span>Je veux faire réaliser un projet</span>
+        </div>
+        <div class="role-opt <?= $role_pre==='particulier'?'selected':'' ?>" data-target="role" data-value="particulier">
+          <div class="ico">🙋</div><strong>Un particulier</strong><span>J'ai un projet personnel</span>
         </div>
         <div class="role-opt <?= $role_pre==='freelance'?'selected':'' ?>" data-target="role" data-value="freelance">
           <div class="ico">👩‍💻</div><strong>Un freelance</strong><span>Je veux recevoir des missions</span>
@@ -84,7 +87,7 @@ require_once __DIR__ . '/includes/header.php';
       </div>
 
       <div class="field">
-        <label for="email">Adresse e-mail professionnelle *</label>
+        <label for="email">Adresse e-mail *</label>
         <input type="email" id="email" name="email" class="input" required value="<?= e($_POST['email'] ?? '') ?>">
       </div>
 
@@ -96,28 +99,24 @@ require_once __DIR__ . '/includes/header.php';
       <!-- Bloc entreprise -->
       <div data-role-block="entreprise" style="<?= $role_pre==='entreprise'?'':'display:none' ?>">
         <div class="field">
-          <label for="societe">Raison sociale</label>
+          <label for="societe">Nom de l'entreprise</label>
           <input type="text" id="societe" name="societe" class="input" value="<?= e($_POST['societe'] ?? '') ?>">
         </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="secteur">Secteur d'activité</label>
-            <select id="secteur" name="secteur" class="select">
-              <option value="">Sélectionner…</option>
-              <?php foreach (['Industrie','SaaS / Logiciel','Commerce / Retail','Services','Santé','Finance','Éducation','Autre'] as $s): ?>
-                <option <?= ($_POST['secteur'] ?? '')===$s?'selected':'' ?>><?= $s ?></option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-          <div class="field">
-            <label for="taille">Effectif</label>
-            <select id="taille" name="taille" class="select">
-              <option value="">Sélectionner…</option>
-              <?php foreach (['1-10','10-50','50-200','200-1000','1000+'] as $t): ?>
-                <option <?= ($_POST['taille'] ?? '')===$t?'selected':'' ?>><?= $t ?> salariés</option>
-              <?php endforeach; ?>
-            </select>
-          </div>
+        <div class="field">
+          <label for="taille">Effectif</label>
+          <select id="taille" name="taille" class="select">
+            <option value="">Sélectionner…</option>
+            <?php foreach (['1-10','10-50','50-200','200-1000','1000+'] as $t): ?>
+              <option <?= ($_POST['taille'] ?? '')===$t?'selected':'' ?>><?= $t ?> salariés</option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bloc particulier : aucun champ supplémentaire -->
+      <div data-role-block="particulier" style="<?= $role_pre==='particulier'?'':'display:none' ?>">
+        <div class="alert alert-info" style="margin-bottom:18px">
+          🙋 En tant que particulier, vous décrivez simplement votre projet : notre équipe s'occupe de tout le reste.
         </div>
       </div>
 
@@ -129,19 +128,15 @@ require_once __DIR__ . '/includes/header.php';
                  placeholder="Ex. Développeuse Full-Stack" value="<?= e($_POST['titre_pro'] ?? '') ?>">
         </div>
         <div class="field">
-          <label>Compétences principales</label>
-          <input type="hidden" id="competences" name="competences" value="<?= e($_POST['competences'] ?? '') ?>">
-          <div class="tagbox" data-input="competences">
-            <?php foreach (['PHP','JavaScript','React','Vue','Python','MySQL','API REST','Flutter','Swift','Kotlin','Figma','UI Design','UX Research','Design System','SEO','Rédaction','Analytics','SQL','Data Viz','WordPress'] as $t): ?>
-              <span class="tag-opt"><?= $t ?></span>
-            <?php endforeach; ?>
-          </div>
-          <div class="hint">Cliquez pour sélectionner vos compétences.</div>
+          <label>Vos compétences</label>
+          <?php champ_competences($_POST['competences'] ?? ''); ?>
+          <div class="hint">Cliquez pour sélectionner toutes vos compétences, dans un ou plusieurs domaines.</div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label for="tjm">TJM indicatif (€)</label>
-            <input type="number" id="tjm" name="tjm" class="input" min="0" step="10" value="<?= e($_POST['tjm'] ?? '') ?>">
+            <label for="tjm">Tarif journalier (€ / jour)</label>
+            <input type="number" id="tjm" name="tjm" class="input" min="0" step="10" placeholder="Ex. 250" value="<?= e($_POST['tjm'] ?? '') ?>">
+            <div class="hint">Ce que vous facturez pour une journée de travail.</div>
           </div>
           <div class="field">
             <label for="experience">Années d'expérience</label>

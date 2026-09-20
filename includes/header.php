@@ -31,7 +31,7 @@ $titre = $titre ?? 'WorkConnects';
       <?php else: ?>
         <a href="<?= dashboard_url() ?>">Tableau de bord</a>
         <a href="messages.php">Messagerie</a>
-        <?php if ($u['role']==='entreprise'): ?><a href="nouveau-projet.php">Nouveau projet</a><?php endif; ?>
+        <?php if (est_client($u['role'])): ?><a href="nouveau-projet.php">Nouveau projet</a><?php endif; ?>
       <?php endif; ?>
     </nav>
 

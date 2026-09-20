@@ -3,7 +3,7 @@ require_once __DIR__ . '/includes/functions.php';
 if (!is_logged()) { header('Location: connexion.php'); exit; }
 $u = user();
 
-if ($u['role']==='entreprise') {
+if (est_client($u['role'])) {
     $st = db()->prepare("SELECT f.*, p.titre FROM factures f JOIN projets p ON p.id=f.projet_id WHERE p.entreprise_id=? ORDER BY f.id DESC");
     $st->execute([$u['id']]);
 } elseif ($u['role']==='freelance') {
@@ -30,7 +30,7 @@ require_once __DIR__ . '/includes/header.php';
   </div>
 
   <div class="grid grid-3 mb-4">
-    <?php if ($u['role']==='entreprise'): ?>
+    <?php if (est_client($u['role'])): ?>
       <div class="stat"><div class="lbl">Total facturé HT</div><div class="val"><?= euros($tot_ht) ?></div><div class="sub">tous projets</div></div>
       <div class="stat"><div class="lbl">Factures payées</div><div class="val"><?= count(array_filter($factures, fn($f)=>$f['statut']==='payee')) ?></div><div class="sub">réglées</div></div>
       <div class="stat accent"><div class="lbl">En attente</div><div class="val"><?= euros(array_sum(array_map(fn($f)=>$f['statut']!=='payee'?$f['montant_ht']:0, $factures))) ?></div><div class="sub">à régler</div></div>

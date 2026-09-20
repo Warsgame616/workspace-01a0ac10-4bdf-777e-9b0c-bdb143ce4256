@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
-require_role('entreprise');
+require_role(['entreprise','particulier']);
 $u = user();
 
 $st = db()->prepare("SELECT p.*, f.nom AS f_nom, f.prenom AS f_prenom, f.titre_pro
