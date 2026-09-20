@@ -114,7 +114,7 @@ function initWizard(){
       ['Titre du projet', v('titre')],
       ['Catégorie', cat ? cat.options[cat.selectedIndex].text : '—'],
       ['Compétences requises', v('competences')],
-      ['Budget estimé', v('budget_min') + ' € – ' + v('budget_max') + ' €'],
+      ['Budget estimé', euroFmt(v('budget_min')) + ' – ' + euroFmt(v('budget_max'))],
       ['Délai souhaité', v('delai')],
       ['Date limite', v('date_limite')]
     ].map(r => '<div class="recap-row"><span>'+r[0]+'</span><strong>'+escapeHtml(r[1])+'</strong></div>').join('');
@@ -160,5 +160,41 @@ function filterTable(input, tableId){
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  initTabs(); initRoles(); initTags(); initWizard(); initCounters(); initChat();
+  initTabs(); initRoles(); initTags(); initWizard(); initCounters(); initChat(); initBudgetRange();
 });
+
+/* ---------- Double curseur de budget (1 € – 5 000 €) ---------- */
+function euroFmt(n){
+  return Number(n).toLocaleString('fr-FR') + ' \u20AC';
+}
+
+function initBudgetRange(){
+  var wrap = document.getElementById('budgetRange');
+  if (!wrap) return;
+
+  var min  = document.getElementById('budget_min');
+  var max  = document.getElementById('budget_max');
+  var fill = document.getElementById('budgetFill');
+  var tMin = document.getElementById('budgetMinTxt');
+  var tMax = document.getElementById('budgetMaxTxt');
+  var LO = parseInt(min.min, 10), HI = parseInt(min.max, 10);
+
+  function render(){
+    var a = parseInt(min.value, 10), b = parseInt(max.value, 10);
+    // Le minimum ne peut jamais dépasser le maximum
+    if (a > b){
+      if (document.activeElement === min) { b = a; max.value = a; }
+      else { a = b; min.value = b; }
+    }
+    tMin.textContent = euroFmt(a);
+    tMax.textContent = euroFmt(b);
+    var p1 = ((a - LO) / (HI - LO)) * 100;
+    var p2 = ((b - LO) / (HI - LO)) * 100;
+    fill.style.left  = p1 + '%';
+    fill.style.width = (p2 - p1) + '%';
+  }
+
+  min.addEventListener('input', render);
+  max.addEventListener('input', render);
+  render();
+}

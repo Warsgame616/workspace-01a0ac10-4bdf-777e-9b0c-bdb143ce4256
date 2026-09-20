@@ -114,15 +114,33 @@ require_once __DIR__ . '/includes/header.php';
           <div class="wz-panel">
             <h3 class="mb-1">Budget et délai</h3>
             <p class="small muted mb-3">Une fourchette indicative suffit. Le devis ferme sera établi après cadrage.</p>
-            <div class="field-row">
-              <div class="field">
-                <label for="budget_min">Budget minimum (€)</label>
-                <input type="number" id="budget_min" name="budget_min" class="input" min="0" step="500" placeholder="10000">
+            <div class="field">
+              <label>Fourchette budgétaire</label>
+
+              <div class="range-wrap" id="budgetRange">
+                <div class="range-values">
+                  <div class="range-val">
+                    <span class="range-lbl">Minimum</span>
+                    <strong id="budgetMinTxt">500 €</strong>
+                  </div>
+                  <div class="range-val" style="text-align:right">
+                    <span class="range-lbl">Maximum</span>
+                    <strong id="budgetMaxTxt">2 500 €</strong>
+                  </div>
+                </div>
+
+                <div class="range-track">
+                  <div class="range-fill" id="budgetFill"></div>
+                  <input type="range" id="budget_min" name="budget_min" min="1" max="5000" step="1" value="500" aria-label="Budget minimum">
+                  <input type="range" id="budget_max" name="budget_max" min="1" max="5000" step="1" value="2500" aria-label="Budget maximum">
+                </div>
+
+                <div class="range-scale">
+                  <span>1 €</span><span>1 250 €</span><span>2 500 €</span><span>3 750 €</span><span>5 000 €</span>
+                </div>
               </div>
-              <div class="field">
-                <label for="budget_max">Budget maximum (€)</label>
-                <input type="number" id="budget_max" name="budget_max" class="input" min="0" step="500" placeholder="20000">
-              </div>
+
+              <div class="hint">Faites glisser les deux curseurs pour définir votre fourchette, entre 1 € et 5 000 €.</div>
             </div>
             <div class="field-row">
               <div class="field">

@@ -453,3 +453,61 @@ tbody tr:hover{background:#FCFDFE}
   .page-head{flex-direction:column}
   .footer-grid{grid-template-columns:1fr}
 }
+
+/* ============================================
+   Double curseur de budget (1 € – 5 000 €)
+   ============================================ */
+.range-wrap{
+  background:var(--line-2);border:1px solid var(--line);
+  border-radius:var(--r);padding:20px 22px 16px;
+}
+.range-values{display:flex;justify-content:space-between;gap:16px;margin-bottom:22px}
+.range-val .range-lbl{
+  display:block;font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);font-weight:700;margin-bottom:3px;
+}
+.range-val strong{font-size:1.375rem;font-weight:800;letter-spacing:-.02em;color:var(--blue)}
+
+.range-track{position:relative;height:26px}
+.range-track::before{
+  content:'';position:absolute;top:11px;left:0;right:0;height:5px;
+  background:var(--line);border-radius:99px;
+}
+.range-fill{
+  position:absolute;top:11px;height:5px;background:var(--blue);
+  border-radius:99px;pointer-events:none;
+}
+
+/* Les deux input range se superposent sur la même piste */
+.range-track input[type=range]{
+  position:absolute;top:0;left:0;width:100%;height:26px;margin:0;
+  -webkit-appearance:none;appearance:none;background:none;pointer-events:none;
+}
+.range-track input[type=range]:focus{outline:none}
+
+.range-track input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;pointer-events:auto;
+  width:22px;height:22px;border-radius:50%;background:#fff;
+  border:3px solid var(--blue);cursor:grab;
+  box-shadow:0 2px 6px rgba(15,23,42,.18);transition:transform .12s,box-shadow .12s;
+}
+.range-track input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12)}
+.range-track input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.18);box-shadow:0 0 0 6px rgba(22,93,255,.16)}
+
+.range-track input[type=range]::-moz-range-thumb{
+  pointer-events:auto;width:22px;height:22px;border-radius:50%;background:#fff;
+  border:3px solid var(--blue);cursor:grab;
+  box-shadow:0 2px 6px rgba(15,23,42,.18);
+}
+.range-track input[type=range]::-moz-range-track{background:none;border:none}
+
+.range-scale{
+  display:flex;justify-content:space-between;margin-top:12px;
+  font-size:.6875rem;color:var(--muted-2);font-weight:500;
+}
+
+@media(max-width:480px){
+  .range-wrap{padding:16px 16px 12px}
+  .range-val strong{font-size:1.125rem}
+  .range-scale span:nth-child(2),.range-scale span:nth-child(4){display:none}
+}
