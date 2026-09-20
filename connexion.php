@@ -1,0 +1,72 @@
+<?php
+require_once __DIR__ . '/includes/functions.php';
+if (is_logged()) { header('Location: ' . dashboard_url()); exit; }
+
+$erreur = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
+    $u = login($_POST['email'] ?? '', $_POST['password'] ?? '');
+    if ($u) {
+        header('Location: ' . dashboard_url($u['role']));
+        exit;
+    }
+    $erreur = "Identifiants incorrects. Vérifiez votre adresse e-mail et votre mot de passe.";
+}
+
+$titre = "Connexion";
+require_once __DIR__ . '/includes/header.php';
+?>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>Connexion</h1>
+    <p>Accédez à votre espace WorkConnects.</p>
+
+    <?php if ($erreur): ?>
+      <div class="alert alert-error"><?= e($erreur) ?></div>
+    <?php endif; ?>
+    <?php if (isset($_GET['inscrit'])): ?>
+      <div class="alert alert-success">Votre compte a bien été créé. Vous pouvez vous connecter.</div>
+    <?php endif; ?>
+
+    <form method="post" novalidate>
+      <?= csrf_field() ?>
+      <div class="field">
+        <label for="email">Adresse e-mail professionnelle</label>
+        <input type="email" id="email" name="email" class="input" required
+               value="<?= e($_POST['email'] ?? '') ?>" placeholder="vous@entreprise.fr" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" class="input" required
+               placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <label class="check mb-3">
+        <input type="checkbox" name="remember"> <span>Rester connecté sur cet appareil</span>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Se connecter</button>
+    </form>
+
+    <div class="demo-box">
+      <h5>Comptes de démonstration — connexion en un clic</h5>
+      <button type="button" class="demo-btn" onclick="fillLogin('entreprise@test.fr','test123')">
+        <span style="font-size:1.125rem">🏢</span>
+        <span><strong>Espace entreprise</strong><span>Nexora Industries — entreprise@test.fr</span></span>
+      </button>
+      <button type="button" class="demo-btn" onclick="fillLogin('marie@freelance.fr','test123')">
+        <span style="font-size:1.125rem">👩‍💻</span>
+        <span><strong>Espace freelance</strong><span>Marie Leroy — marie@freelance.fr</span></span>
+      </button>
+      <button type="button" class="demo-btn" onclick="fillLogin('admin@workconnects.fr','admin123')">
+        <span style="font-size:1.125rem">🛡️</span>
+        <span><strong>Back-office WorkConnects</strong><span>Administration — admin@workconnects.fr</span></span>
+      </button>
+    </div>
+
+    <div class="auth-alt">
+      Pas encore de compte ? <a href="inscription.php">Créer un compte</a>
+    </div>
+  </div>
+</div>
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

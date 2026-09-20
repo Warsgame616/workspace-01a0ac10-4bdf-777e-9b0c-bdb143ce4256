@@ -1,0 +1,6 @@
+# Interdit tout accès web au dossier data (base de données SQLite)
+Require all denied
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>
