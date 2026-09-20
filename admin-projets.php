@@ -39,7 +39,7 @@ require_once __DIR__ . '/includes/header.php';
             <td><div class="t-title"><?= e($p['titre']) ?></div><div class="t-sub"><?= e($p['categorie']) ?></div></td>
             <td class="small"><?= e($p['societe']) ?></td>
             <td class="small"><?= e(trim($p['f_prenom'].' '.$p['f_nom'])) ?: '<span class="muted">Non attribué</span>' ?></td>
-            <td class="small"><?= $p['montant_final'] ? '<strong>'.euros($p['montant_final']).'</strong>' : euros($p['budget_min']).' – '.euros($p['budget_max']) ?></td>
+            <td class="small"><?= $p['montant_final'] ? '<strong>'.euros($p['montant_final']).'</strong>' : euros($p['budget_min']).' – '.euros_max($p['budget_max']) ?></td>
             <td><span class="badge <?= statut_classe($p['statut']) ?>"><?= statut_label($p['statut']) ?></span></td>
             <td style="min-width:110px"><div class="bar"><i style="width:<?= (int)$p['avancement'] ?>%"></i></div><div class="t-sub"><?= (int)$p['avancement'] ?> %</div></td>
             <td style="white-space:nowrap">

@@ -1,5 +1,9 @@
 data/*.sqlite
 data/*.db
+uploads/projets/*
+uploads/portfolio/*
+!uploads/*/.gitkeep
+!uploads/*/.htaccess
 __pycache__/
 *.pyc
 .DS_Store

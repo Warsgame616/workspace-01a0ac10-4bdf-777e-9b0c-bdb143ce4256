@@ -71,7 +71,7 @@ require_once __DIR__ . '/includes/header.php';
               <div class="score <?= $s>=75?'high':($s>=50?'mid':'low') ?>"><?= $s ?>%</div>
               <div style="flex:1;min-width:0">
                 <h4><?= e($p['titre']) ?></h4>
-                <p class="small muted"><?= e($p['categorie']) ?> · <?= euros($p['budget_min']) ?> – <?= euros($p['budget_max']) ?> · <?= e($p['delai']) ?></p>
+                <p class="small muted"><?= e($p['categorie']) ?> · <?= euros($p['budget_min']) ?> – <?= euros_max($p['budget_max']) ?> · <?= e($p['delai']) ?></p>
                 <div class="crit">
                   <?php foreach (array_filter(array_map('trim', explode(',', $p['competences']))) as $c): ?>
                     <span><?= e($c) ?></span>

@@ -68,7 +68,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="bar <?= $p['avancement']>=100?'green':'' ?>"><i style="width:<?= (int)$p['avancement'] ?>%"></i></div>
           </div>
           <div class="flex-between mt-3" style="padding-top:14px;border-top:1px solid var(--line-2)">
-            <span class="small strong"><?= euros($p['budget_min']) ?> – <?= euros($p['budget_max']) ?></span>
+            <span class="small strong"><?= euros($p['budget_min']) ?> – <?= euros_max($p['budget_max']) ?></span>
             <a href="projet.php?id=<?= $p['id'] ?>" class="btn btn-ghost btn-sm">Voir le détail →</a>
           </div>
         </div>

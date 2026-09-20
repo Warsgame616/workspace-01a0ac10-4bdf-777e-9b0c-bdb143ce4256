@@ -86,6 +86,15 @@ function install_schema(PDO $pdo) {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS portfolio (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        titre TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        image TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL REFERENCES users(id),
@@ -149,20 +158,20 @@ function seed_data(PDO $pdo) {
         ['admin@workconnects.fr', $h('admin123'), 'admin', 'Dupont', 'Sophie', '0600000000', 'WorkConnects', '', '', '', 'Responsable de compte', '', '', 0, 0, 'disponible', 0, 0],
         ['entreprise@test.fr', $h('test123'), 'entreprise', 'Martin', 'Julien', '0611223344', 'Nexora Industries', '81234567800021', 'Industrie', '50-200', '', 'PME industrielle en transformation numérique.', '', 0, 0, '', 0, 0],
         ['contact@luminatech.fr', $h('test123'), 'entreprise', 'Bernard', 'Claire', '0622334455', 'LuminaTech', '81234567800039', 'SaaS', '10-50', '', 'Éditeur de logiciels B2B.', '', 0, 0, '', 0, 0],
-        ['marie@freelance.fr', $h('test123'), 'freelance', 'Leroy', 'Marie', '0633445566', '', '', '', '', 'Développeuse Full-Stack', 'Développeuse web avec 8 ans d\'expérience sur des projets B2B exigeants.', 'PHP,JavaScript,React,MySQL,API REST', 550, 8, 'disponible', 4.8, 23],
-        ['thomas@freelance.fr', $h('test123'), 'freelance', 'Moreau', 'Thomas', '0644556677', '', '', '', '', 'Designer UI/UX', 'Designer produit spécialisé interfaces B2B et design systems.', 'Figma,UI Design,UX Research,Design System,Webflow', 480, 6, 'disponible', 4.6, 17],
-        ['sarah@freelance.fr', $h('test123'), 'freelance', 'Benali', 'Sarah', '0655667788', '', '', '', '', 'Consultante SEO & Contenu', 'Stratégie de contenu et référencement naturel pour le B2B.', 'SEO,Rédaction,Analytics,Content Strategy', 420, 5, 'occupe', 4.9, 31],
-        ['karim@freelance.fr', $h('test123'), 'freelance', 'Haddad', 'Karim', '0666778899', '', '', '', '', 'Développeur Mobile', 'Applications iOS et Android natives et cross-platform.', 'Flutter,Swift,Kotlin,Firebase,API REST', 600, 7, 'disponible', 4.7, 14],
+        ['marie@freelance.fr', $h('test123'), 'freelance', 'Leroy', 'Marie', '0633445566', '', '', '', '', 'Développeuse Full-Stack', 'Développeuse web avec 8 ans d\'expérience sur des projets B2B exigeants.', 'PHP,JavaScript,React,MySQL,API REST', 120, 8, 'disponible', 4.8, 23],
+        ['thomas@freelance.fr', $h('test123'), 'freelance', 'Moreau', 'Thomas', '0644556677', '', '', '', '', 'Designer UI/UX', 'Designer produit spécialisé interfaces B2B et design systems.', 'Figma,UI Design,UX Research,Design System,Webflow', 110, 6, 'disponible', 4.6, 17],
+        ['sarah@freelance.fr', $h('test123'), 'freelance', 'Benali', 'Sarah', '0655667788', '', '', '', '', 'Consultante SEO & Contenu', 'Stratégie de contenu et référencement naturel pour le B2B.', 'SEO,Rédaction,Analytics,Content Strategy', 95, 5, 'occupe', 4.9, 31],
+        ['karim@freelance.fr', $h('test123'), 'freelance', 'Haddad', 'Karim', '0666778899', '', '', '', '', 'Développeur Mobile', 'Applications iOS et Android natives et cross-platform.', 'Flutter,Swift,Kotlin,Firebase,API REST', 140, 7, 'disponible', 4.7, 14],
     ];
     $st = $pdo->prepare("INSERT INTO users (email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,titre_pro,bio,competences,tjm,experience,disponibilite,note_moyenne,nb_missions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     foreach ($users as $u) { $st->execute($u); }
 
     $projets = [
-        [2, 4, 'Refonte du site vitrine corporate', 'Développement Web', "Refonte complète de notre site vitrine avec un design premium, optimisation des performances et intégration d'un back-office simple pour l'équipe marketing.", 'PHP,JavaScript,SEO', 12000, 18000, '2 mois', '2026-11-15', 'en_cours', 65, 15000],
-        [2, null, 'Application mobile de suivi de production', 'Développement Mobile', "Application interne permettant aux chefs d'atelier de suivre la production en temps réel, avec mode hors-ligne et synchronisation.", 'Flutter,API REST,Firebase', 25000, 40000, '4 mois', '2027-01-30', 'analyse', 0, 0],
-        [3, 5, 'Design system et refonte UI du produit SaaS', 'Design UI/UX', "Création d'un design system complet et refonte des écrans principaux de notre plateforme SaaS B2B.", 'Figma,Design System,UI Design', 15000, 22000, '3 mois', '2026-12-20', 'en_cours', 40, 19000],
-        [3, 6, 'Stratégie SEO et contenu 2026', 'Marketing Digital', "Audit SEO complet, définition d'une stratégie de contenu sur 12 mois et production des premiers articles piliers.", 'SEO,Rédaction,Analytics', 8000, 12000, '6 mois', '2027-03-01', 'termine', 100, 10500],
-        [2, null, "Automatisation des rapports financiers", 'Data & Automatisation', "Mise en place de tableaux de bord automatisés consolidant les données de nos différents outils de gestion.", 'Python,SQL,Data Viz', 9000, 14000, '2 mois', '2026-12-10', 'nouveau', 0, 0],
+        [2, 4, 'Refonte du site vitrine corporate', 'Développement Web', "Refonte complète de notre site vitrine avec un design premium, optimisation des performances et intégration d'un back-office simple pour l'équipe marketing.", 'PHP,JavaScript,SEO', 2500, 4000, '2 mois', '2026-11-15', 'en_cours', 65, 3600],
+        [2, null, 'Application mobile de suivi de production', 'Développement Mobile', "Application interne permettant aux chefs d'atelier de suivre la production en temps réel, avec mode hors-ligne et synchronisation.", 'Flutter,API REST,Firebase', 3500, 5000, '4 mois', '2027-01-30', 'analyse', 0, 0],
+        [3, 5, 'Design system et refonte UI du produit SaaS', 'Design UI/UX', "Création d'un design system complet et refonte des écrans principaux de notre plateforme SaaS B2B.", 'Figma,Design System,UI Design', 2800, 4500, '3 mois', '2026-12-20', 'en_cours', 40, 4200],
+        [3, 6, 'Stratégie SEO et contenu 2026', 'Marketing Digital', "Audit SEO complet, définition d'une stratégie de contenu sur 12 mois et production des premiers articles piliers.", 'SEO,Rédaction,Analytics', 1500, 2800, '6 mois', '2027-03-01', 'termine', 100, 2400],
+        [2, null, "Automatisation des rapports financiers", 'Data & Automatisation', "Mise en place de tableaux de bord automatisés consolidant les données de nos différents outils de gestion.", 'Python,SQL,Data Viz', 1200, 2500, '2 mois', '2026-12-10', 'nouveau', 0, 0],
     ];
     $st = $pdo->prepare("INSERT INTO projets (entreprise_id,freelance_id,titre,categorie,description,competences,budget_min,budget_max,delai,date_limite,statut,avancement,montant_final) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
     foreach ($projets as $p) { $st->execute($p); }
@@ -187,7 +196,7 @@ function seed_data(PDO $pdo) {
     foreach ($notifs as $n) { $st->execute($n); }
 
     $pdo->prepare("INSERT INTO factures (projet_id,numero,montant_ht,commission,montant_freelance,statut) VALUES (?,?,?,?,?,?)")
-        ->execute([4, 'FA-2026-0041', 10500, 2100, 8400, 'payee']);
+        ->execute([4, 'FA-2026-0041', 2400, 480, 1920, 'payee']);
     $pdo->prepare("INSERT INTO evaluations (projet_id,auteur_id,cible_id,note,commentaire) VALUES (?,?,?,?,?)")
         ->execute([4, 3, 6, 5, "Travail remarquable, résultats mesurables dès le troisième mois."]);
 }

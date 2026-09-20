@@ -61,7 +61,7 @@ require_once __DIR__ . '/includes/header.php';
               <div class="t-sub"><?= e($p['categorie']) ?></div>
             </td>
             <td class="small"><?= e($p['societe']) ?></td>
-            <td class="small"><?= euros($p['budget_min']) ?> – <?= euros($p['budget_max']) ?></td>
+            <td class="small"><?= euros($p['budget_min']) ?> – <?= euros_max($p['budget_max']) ?></td>
             <td><span class="badge <?= statut_classe($p['statut']) ?>"><?= statut_label($p['statut']) ?></span></td>
             <td class="small muted"><?= date_fr($p['created_at']) ?></td>
             <td><a href="admin-matching.php?id=<?= $p['id'] ?>" class="btn btn-primary btn-sm">🎯 Lancer le matching</a></td>

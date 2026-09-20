@@ -120,6 +120,11 @@ function statut_classe($s) {
     ][$s] ?? 'badge-gray';
 }
 function euros($n) { return number_format((float)$n, 0, ',', ' ') . ' €'; }
+/* Plafond du curseur budget : au-dela on affiche "5 000 €+" */
+define('BUDGET_PLAFOND', 5000);
+function euros_max($n) {
+    return number_format((float)$n, 0, ',', ' ') . ' €' . ((float)$n >= BUDGET_PLAFOND ? '+' : '');
+}
 function date_fr($d) { return $d ? date('d/m/Y', strtotime($d)) : '—'; }
 function initiales($u) { return strtoupper(mb_substr($u['prenom'] ?: $u['nom'], 0, 1) . mb_substr($u['nom'], 0, 1)); }
 
@@ -187,4 +192,85 @@ function stats_globales() {
         'commissions'   => (int)$d->query("SELECT COALESCE(SUM(commission),0) FROM factures")->fetchColumn(),
         'messages_nl'   => (int)$d->query("SELECT COUNT(*) FROM messages WHERE destinataire_id=1 AND lu=0")->fetchColumn(),
     ];
+}
+
+/* ============================================
+   Gestion des fichiers téléversés
+   ============================================ */
+
+define('UPLOAD_MAX', 8 * 1024 * 1024); // 8 Mo
+
+/** Extensions autorisées pour les livrables de projet */
+function ext_doc_autorisees() {
+    return ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','zip','rar',
+            'jpg','jpeg','png','gif','webp','svg','ai','psd','fig','mp4','mov'];
+}
+/** Extensions autorisées pour les images de portfolio */
+function ext_img_autorisees() { return ['jpg','jpeg','png','gif','webp']; }
+
+/**
+ * Traite un fichier téléversé et le range dans /uploads/<sous_dossier>/
+ * Renvoie ['ok'=>bool, 'nom'=>string, 'chemin'=>string, 'taille'=>int, 'erreur'=>string]
+ */
+function traiter_upload(array $file, $sous_dossier, array $extensions) {
+    if (!isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+        return ['ok' => false, 'erreur' => "Aucun fichier sélectionné."];
+    }
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return ['ok' => false, 'erreur' => "Le téléversement a échoué (le fichier est peut-être trop lourd)."];
+    }
+    if ($file['size'] > UPLOAD_MAX) {
+        return ['ok' => false, 'erreur' => "Fichier trop volumineux : 8 Mo maximum."];
+    }
+
+    $nom_original = $file['name'];
+    $ext = strtolower(pathinfo($nom_original, PATHINFO_EXTENSION));
+    if (!in_array($ext, $extensions, true)) {
+        return ['ok' => false, 'erreur' => "Format non autorisé (." . htmlspecialchars($ext) . ")."];
+    }
+
+    // Nom de stockage aléatoire : empêche l'écrasement et l'exécution
+    $nom_stocke = bin2hex(random_bytes(12)) . '.' . $ext;
+    $dossier = __DIR__ . '/../uploads/' . $sous_dossier;
+    if (!is_dir($dossier)) { @mkdir($dossier, 0755, true); }
+    $destination = $dossier . '/' . $nom_stocke;
+
+    if (!move_uploaded_file($file['tmp_name'], $destination)) {
+        return ['ok' => false, 'erreur' => "Impossible d'enregistrer le fichier sur le serveur."];
+    }
+    @chmod($destination, 0644);
+
+    return [
+        'ok'     => true,
+        'nom'    => mb_substr($nom_original, 0, 180),
+        'chemin' => $sous_dossier . '/' . $nom_stocke,
+        'taille' => (int)$file['size'],
+    ];
+}
+
+/** Récupère le portfolio d'un freelance */
+function portfolio_de($user_id) {
+    $st = db()->prepare("SELECT * FROM portfolio WHERE user_id = ? ORDER BY id DESC");
+    $st->execute([$user_id]);
+    return $st->fetchAll();
+}
+
+/** Icône associée à une extension de fichier */
+function icone_fichier($nom) {
+    $e = strtolower(pathinfo($nom, PATHINFO_EXTENSION));
+    if (in_array($e, ['jpg','jpeg','png','gif','webp','svg','psd','ai','fig'])) return '🖼️';
+    if (in_array($e, ['pdf'])) return '📕';
+    if (in_array($e, ['doc','docx','txt'])) return '📄';
+    if (in_array($e, ['xls','xlsx','csv'])) return '📊';
+    if (in_array($e, ['ppt','pptx'])) return '📽️';
+    if (in_array($e, ['zip','rar'])) return '🗜️';
+    if (in_array($e, ['mp4','mov'])) return '🎬';
+    return '📎';
+}
+
+/** Taille lisible */
+function taille_lisible($o) {
+    if ($o >= 1048576) return round($o / 1048576, 1) . ' Mo';
+    if ($o >= 1024)    return round($o / 1024) . ' Ko';
+    return $o . ' o';
 }

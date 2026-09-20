@@ -61,7 +61,7 @@ require_once __DIR__ . '/includes/header.php';
             <tr>
               <td>
                 <div class="t-title"><?= e($p['titre']) ?></div>
-                <div class="t-sub"><?= e($p['categorie']) ?> · <?= euros($p['budget_min']) ?> – <?= euros($p['budget_max']) ?></div>
+                <div class="t-sub"><?= e($p['categorie']) ?> · <?= euros($p['budget_min']) ?> – <?= euros_max($p['budget_max']) ?></div>
               </td>
               <td><span class="badge <?= statut_classe($p['statut']) ?>"><?= statut_label($p['statut']) ?></span></td>
               <td class="small">

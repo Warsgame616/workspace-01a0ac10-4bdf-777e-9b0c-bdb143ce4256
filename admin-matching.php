@@ -93,6 +93,15 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endforeach; ?>
               </div>
 
+              <?php $pfs = portfolio_de($f['id']); if ($pfs): ?>
+                <div class="pf-mini" title="Portfolio du freelance">
+                  <?php foreach (array_slice($pfs, 0, 6) as $pf): ?>
+                    <img src="uploads/<?= e($pf['image']) ?>" alt="<?= e($pf['titre']) ?>" loading="lazy">
+                  <?php endforeach; ?>
+                  <?php if (count($pfs) > 6): ?><span class="small muted" style="align-self:center">+<?= count($pfs)-6 ?></span><?php endif; ?>
+                </div>
+              <?php endif; ?>
+
               <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px">
                 <?php foreach ($labels as $k => $lab): ?>
                   <div>
@@ -115,7 +124,7 @@ require_once __DIR__ . '/includes/header.php';
           <div class="recap">
             <div class="recap-row"><span>Client</span><strong><?= e($projet['societe']) ?></strong></div>
             <div class="recap-row"><span>Catégorie</span><strong><?= e($projet['categorie']) ?></strong></div>
-            <div class="recap-row"><span>Budget</span><strong><?= euros($projet['budget_min']) ?> – <?= euros($projet['budget_max']) ?></strong></div>
+            <div class="recap-row"><span>Budget</span><strong><?= euros($projet['budget_min']) ?> – <?= euros_max($projet['budget_max']) ?></strong></div>
             <div class="recap-row"><span>Délai</span><strong><?= e($projet['delai']) ?></strong></div>
             <div class="recap-row"><span>Échéance</span><strong><?= date_fr($projet['date_limite']) ?></strong></div>
             <div class="recap-row"><span>Statut</span><strong><span class="badge <?= statut_classe($projet['statut']) ?>"><?= statut_label($projet['statut']) ?></span></strong></div>

@@ -16,6 +16,27 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             ]);
         flash("Profil mis à jour.");
     }
+    // Ajout d'une réalisation au portfolio (freelance)
+    if (isset($_POST['form_portfolio']) && $u['role'] === 'freelance') {
+        $r = traiter_upload($_FILES['image'] ?? [], 'portfolio', ext_img_autorisees());
+        if ($r['ok']) {
+            db()->prepare("INSERT INTO portfolio (user_id,titre,description,image) VALUES (?,?,?,?)")
+                ->execute([$u['id'], trim($_POST['pf_titre'] ?? ''), trim($_POST['pf_desc'] ?? ''), $r['chemin']]);
+            flash("Réalisation ajoutée à votre portfolio.");
+        } else {
+            flash($r['erreur'], 'error');
+        }
+    }
+    // Suppression d'une réalisation
+    if (isset($_POST['suppr_pf']) && $u['role'] === 'freelance') {
+        $q = db()->prepare("SELECT * FROM portfolio WHERE id=? AND user_id=?");
+        $q->execute([(int)$_POST['suppr_pf'], $u['id']]);
+        if ($pf = $q->fetch()) {
+            @unlink(__DIR__.'/uploads/'.$pf['image']);
+            db()->prepare("DELETE FROM portfolio WHERE id=?")->execute([$pf['id']]);
+            flash("Réalisation supprimée.");
+        }
+    }
     if (isset($_POST['form_mdp'])) {
         if (!password_verify($_POST['ancien'] ?? '', $u['password_hash'])) { flash("Mot de passe actuel incorrect.", 'error'); }
         elseif (strlen($_POST['nouveau'] ?? '') < 6) { flash("Le nouveau mot de passe doit faire 6 caractères minimum.", 'error'); }
@@ -49,6 +70,7 @@ require_once __DIR__ . '/includes/header.php';
 
   <div data-tabs class="tabs">
     <div class="tab active" data-tab="p1">Informations</div>
+    <?php if ($u['role']==='freelance'): ?><div class="tab" data-tab="p4">Portfolio</div><?php endif; ?>
     <div class="tab" data-tab="p2">Sécurité</div>
     <div class="tab" data-tab="p3">Confidentialité / RGPD</div>
   </div>
@@ -106,6 +128,69 @@ require_once __DIR__ . '/includes/header.php';
       </div>
     </form>
   </div>
+
+  <?php if ($u['role']==='freelance'): $pfs = portfolio_de($u['id']); ?>
+  <div data-panel="p4" class="tab-panel">
+    <div class="panel mb-3" style="max-width:860px">
+      <div class="panel-head">
+        <h3>Ajouter une réalisation</h3>
+        <span class="badge badge-gray"><?= count($pfs) ?> visuel<?= count($pfs)>1?'s':'' ?></span>
+      </div>
+      <div class="panel-body">
+        <form method="post" enctype="multipart/form-data">
+          <?= csrf_field() ?><input type="hidden" name="form_portfolio" value="1">
+          <div class="field-row">
+            <div class="field">
+              <label for="pf_titre">Titre de la réalisation</label>
+              <input type="text" id="pf_titre" name="pf_titre" class="input" placeholder="Ex. Refonte e-commerce Maison Duval">
+            </div>
+            <div class="field">
+              <label for="pf_desc">Courte description</label>
+              <input type="text" id="pf_desc" name="pf_desc" class="input" placeholder="Ex. Site sur mesure, +38 % de conversion">
+            </div>
+          </div>
+          <div class="field">
+            <label for="pfImage">Visuel *</label>
+            <input type="file" name="image" id="pfImage" accept="image/jpeg,image/png,image/gif,image/webp" required
+                   class="input" onchange="previewImg(this,'pfPreview')">
+            <div class="hint">JPG, PNG, GIF ou WEBP — 8 Mo maximum.</div>
+            <img id="pfPreview" class="pf-preview" alt="">
+          </div>
+          <button type="submit" class="btn btn-primary">Ajouter au portfolio</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel" style="max-width:860px">
+      <div class="panel-head"><h3>Mes réalisations</h3></div>
+      <?php if (!$pfs): ?>
+        <div class="empty" style="padding:40px">
+          <div class="ico">🖼️</div>
+          <h3>Votre portfolio est vide</h3>
+          <p>Ajoutez des visuels de vos projets : ils sont transmis aux clients lors de nos recommandations.</p>
+        </div>
+      <?php else: ?>
+        <div class="panel-body">
+          <div class="pf-grid">
+            <?php foreach ($pfs as $pf): ?>
+              <figure class="pf-card">
+                <img src="uploads/<?= e($pf['image']) ?>" alt="<?= e($pf['titre']) ?>" loading="lazy">
+                <figcaption>
+                  <strong><?= e($pf['titre'] ?: 'Sans titre') ?></strong>
+                  <?php if ($pf['description']): ?><span><?= e($pf['description']) ?></span><?php endif; ?>
+                  <form method="post" onsubmit="return confirm('Supprimer cette réalisation ?')">
+                    <?= csrf_field() ?>
+                    <button name="suppr_pf" value="<?= $pf['id'] ?>" class="btn btn-ghost btn-sm">🗑 Supprimer</button>
+                  </form>
+                </figcaption>
+              </figure>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+  <?php endif; ?>
 
   <div data-panel="p2" class="tab-panel">
     <form method="post" style="max-width:520px">

@@ -18,8 +18,70 @@ if (!$p) { header('Location: ' . dashboard_url()); exit; }
 $autorise = ($u['role']==='admin') || ($p['entreprise_id']==$u['id']) || ($p['freelance_id']==$u['id']);
 if (!$autorise) { header('Location: ' . dashboard_url()); exit; }
 
+// Téléversement d'un livrable (tous les intervenants du projet)
+if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_fichier'])) {
+    csrf_check();
+    $r = traiter_upload($_FILES['fichier'] ?? [], 'projets', ext_doc_autorisees());
+    if ($r['ok']) {
+        db()->prepare("INSERT INTO fichiers (projet_id,uploader_id,nom,chemin,taille) VALUES (?,?,?,?,?)")
+            ->execute([$id, $u['id'], $r['nom'], $r['chemin'], $r['taille']]);
+        $qui = $u['role']==='admin' ? 'WorkConnects' : trim($u['prenom'].' '.$u['nom']);
+        foreach ([$p['entreprise_id'], $p['freelance_id'], 1] as $dest) {
+            if ($dest && (int)$dest !== (int)$u['id']) {
+                notify($dest, "Nouveau fichier déposé sur « ".$p['titre']." » par ".$qui.".", 'projet.php?id='.$id);
+            }
+        }
+        flash("Fichier « ".$r['nom']." » déposé.");
+    } else {
+        flash($r['erreur'], 'error');
+    }
+    header('Location: projet.php?id='.$id); exit;
+}
+
+// Suppression d'un fichier (son auteur ou l'administrateur)
+if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['suppr_fichier'])) {
+    csrf_check();
+    $fid = (int)$_POST['suppr_fichier'];
+    $q = db()->prepare("SELECT * FROM fichiers WHERE id=? AND projet_id=?");
+    $q->execute([$fid, $id]);
+    if ($fi = $q->fetch()) {
+        if ($u['role']==='admin' || (int)$fi['uploader_id'] === (int)$u['id']) {
+            @unlink(__DIR__.'/uploads/'.$fi['chemin']);
+            db()->prepare("DELETE FROM fichiers WHERE id=?")->execute([$fid]);
+            flash("Fichier supprimé.");
+        }
+    }
+    header('Location: projet.php?id='.$id); exit;
+}
+
+// Évaluation du projet livré (par le client)
+if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_eval'])) {
+    csrf_check();
+    $note = max(1, min(5, (int)($_POST['note'] ?? 0)));
+    if ($p['statut']==='termine' && $p['freelance_id'] && (int)$p['entreprise_id'] === (int)$u['id']) {
+        $dej = db()->prepare("SELECT COUNT(*) FROM evaluations WHERE projet_id=? AND auteur_id=?");
+        $dej->execute([$id, $u['id']]);
+        if (!$dej->fetchColumn()) {
+            db()->prepare("INSERT INTO evaluations (projet_id,auteur_id,cible_id,note,commentaire) VALUES (?,?,?,?,?)")
+                ->execute([$id, $u['id'], $p['freelance_id'], $note, trim($_POST['commentaire'] ?? '')]);
+            // Moyenne pondérée : l'historique déjà acquis est conservé
+            $fq = db()->prepare("SELECT note_moyenne, nb_missions FROM users WHERE id=?");
+            $fq->execute([$p['freelance_id']]);
+            $fl = $fq->fetch();
+            $nb_av  = max(0, (int)$fl['nb_missions']);
+            $moy_av = (float)$fl['note_moyenne'];
+            $moy = $nb_av > 0 ? round((($moy_av * $nb_av) + $note) / ($nb_av + 1), 2) : (float)$note;
+            db()->prepare("UPDATE users SET note_moyenne=?, nb_missions=nb_missions+1 WHERE id=?")
+                ->execute([$moy, $p['freelance_id']]);
+            notify(1, "Nouvelle évaluation (".$note."/5) sur « ".$p['titre']." ».", 'projet.php?id='.$id);
+            flash("Merci, votre évaluation a bien été enregistrée.");
+        }
+    }
+    header('Location: projet.php?id='.$id); exit;
+}
+
 // Mise à jour (admin uniquement)
-if ($_SERVER['REQUEST_METHOD']==='POST' && $u['role']==='admin') {
+if ($_SERVER['REQUEST_METHOD']==='POST' && $u['role']==='admin' && isset($_POST['form_suivi'])) {
     csrf_check();
     db()->prepare("UPDATE projets SET statut=?, avancement=?, montant_final=? WHERE id=?")
         ->execute([$_POST['statut'], (int)$_POST['avancement'], (int)$_POST['montant_final'], $id]);
@@ -38,10 +100,20 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $u['role']==='admin') {
     header('Location: projet.php?id='.$id); exit;
 }
 
-$fs = db()->prepare("SELECT * FROM fichiers WHERE projet_id=? ORDER BY id DESC"); $fs->execute([$id]);
+$fs = db()->prepare("SELECT f.*, u.nom AS u_nom, u.prenom AS u_prenom, u.role AS u_role
+                     FROM fichiers f LEFT JOIN users u ON u.id=f.uploader_id
+                     WHERE f.projet_id=? ORDER BY f.id DESC"); $fs->execute([$id]);
 $fichiers = $fs->fetchAll();
 $fa = db()->prepare("SELECT * FROM factures WHERE projet_id=?"); $fa->execute([$id]);
 $factures = $fa->fetchAll();
+
+$ev = db()->prepare("SELECT e.*, a.nom AS a_nom, a.prenom AS a_prenom, a.societe
+                     FROM evaluations e LEFT JOIN users a ON a.id=e.auteur_id
+                     WHERE e.projet_id=?");
+$ev->execute([$id]);
+$evaluations = $ev->fetchAll();
+$peut_evaluer = ($u['role']==='entreprise' && (int)$p['entreprise_id']===(int)$u['id']
+                 && $p['statut']==='termine' && $p['freelance_id'] && !$evaluations);
 
 $etapes = ['nouveau'=>0,'analyse'=>1,'attribue'=>2,'en_cours'=>3,'livraison'=>4,'termine'=>5];
 $cur_etape = $etapes[$p['statut']] ?? 0;
@@ -122,31 +194,99 @@ require_once __DIR__ . '/includes/header.php';
           <h3>Fichiers &amp; livrables</h3>
           <span class="badge badge-gray"><?= count($fichiers) ?> fichier<?= count($fichiers)>1?'s':'' ?></span>
         </div>
-        <?php if (!$fichiers): ?>
-          <div class="empty" style="padding:32px">
-            <div class="ico">📎</div>
-            <h3>Aucun fichier</h3>
-            <p>Les livrables apparaîtront ici au fur et à mesure de la mission.</p>
-          </div>
-        <?php else: ?>
-          <div class="panel-body">
+        <div class="panel-body">
+          <form method="post" enctype="multipart/form-data" class="upload-zone" id="upProjet">
+            <?= csrf_field() ?><input type="hidden" name="form_fichier" value="1">
+            <input type="file" name="fichier" id="fichierProjet" hidden
+                   onchange="document.getElementById('upProjet').submit()">
+            <label for="fichierProjet" class="upload-label">
+              <span class="upload-ico">📤</span>
+              <strong>Déposer un fichier</strong>
+              <span class="small muted">PDF, Word, Excel, images, ZIP, vidéo — 8 Mo maximum</span>
+            </label>
+          </form>
+
+          <?php if (!$fichiers): ?>
+            <div class="empty" style="padding:26px 0 6px">
+              <div class="ico">📎</div>
+              <h3>Aucun fichier pour l'instant</h3>
+              <p>Les livrables déposés apparaîtront ici.</p>
+            </div>
+          <?php else: ?>
+            <div class="mt-3">
             <?php foreach ($fichiers as $fi): ?>
-              <div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--line-2)">
-                <div class="flex-center"><span>📄</span><div><strong class="small"><?= e($fi['nom']) ?></strong>
-                  <div class="t-sub"><?= date_fr($fi['created_at']) ?> · <?= round($fi['taille']/1024) ?> Ko</div></div></div>
-                <span class="btn btn-ghost btn-sm">Télécharger</span>
+              <div class="file-row">
+                <span class="file-ico"><?= icone_fichier($fi['nom']) ?></span>
+                <div style="flex:1;min-width:0">
+                  <strong class="small" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><?= e($fi['nom']) ?></strong>
+                  <div class="t-sub">
+                    <?= taille_lisible($fi['taille']) ?> · <?= date_fr($fi['created_at']) ?>
+                    · déposé par <?= $fi['u_role']==='admin' ? 'WorkConnects' : e(trim($fi['u_prenom'].' '.mb_substr($fi['u_nom'],0,1).'.')) ?>
+                  </div>
+                </div>
+                <a href="download.php?id=<?= $fi['id'] ?>" class="btn btn-ghost btn-sm">⬇ Télécharger</a>
+                <?php if ($u['role']==='admin' || (int)$fi['uploader_id'] === (int)$u['id']): ?>
+                  <form method="post" style="margin:0" onsubmit="return confirm('Supprimer ce fichier ?')">
+                    <?= csrf_field() ?>
+                    <button name="suppr_fichier" value="<?= $fi['id'] ?>" class="btn btn-ghost btn-sm" title="Supprimer">🗑</button>
+                  </form>
+                <?php endif; ?>
               </div>
             <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
+            </div>
+          <?php endif; ?>
+        </div>
       </div>
+
+      <?php if ($peut_evaluer): ?>
+      <div class="panel" style="border-color:var(--green)">
+        <div class="panel-head"><h3>⭐ Évaluer la prestation</h3><span class="badge badge-green">Projet livré</span></div>
+        <div class="panel-body">
+          <p class="small muted mb-3">Votre retour nous aide à sélectionner les meilleurs experts pour vos prochains projets.</p>
+          <form method="post">
+            <?= csrf_field() ?><input type="hidden" name="form_eval" value="1">
+            <div class="field">
+              <label>Votre note</label>
+              <div class="star-pick" id="starPick">
+                <?php for ($i=5; $i>=1; $i--): ?>
+                  <input type="radio" name="note" id="st<?= $i ?>" value="<?= $i ?>" <?= $i===5?'checked':'' ?>>
+                  <label for="st<?= $i ?>" title="<?= $i ?> sur 5">★</label>
+                <?php endfor; ?>
+              </div>
+            </div>
+            <div class="field">
+              <label for="commentaire">Commentaire (facultatif)</label>
+              <textarea id="commentaire" name="commentaire" class="textarea" style="min-height:90px"
+                        placeholder="Qualité du livrable, respect des délais, communication…"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Envoyer mon évaluation</button>
+          </form>
+        </div>
+      </div>
+      <?php endif; ?>
+
+      <?php if ($evaluations): ?>
+      <div class="panel">
+        <div class="panel-head"><h3>Évaluation</h3></div>
+        <div class="panel-body">
+          <?php foreach ($evaluations as $ev1): ?>
+            <div class="flex-between mb-1">
+              <strong class="small"><?= e($ev1['societe'] ?: trim($ev1['a_prenom'].' '.$ev1['a_nom'])) ?></strong>
+              <span class="stars"><?= str_repeat('★',(int)$ev1['note']).str_repeat('☆',5-(int)$ev1['note']) ?></span>
+            </div>
+            <?php if ($ev1['commentaire']): ?><p class="small">« <?= e($ev1['commentaire']) ?> »</p><?php endif; ?>
+            <p class="t-sub mt-1"><?= date_fr($ev1['created_at']) ?></p>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endif; ?>
 
       <?php if ($u['role']==='admin'): ?>
       <div class="panel" style="border-color:var(--blue)">
         <div class="panel-head"><h3>🛠️ Gestion WorkConnects</h3><span class="badge badge-blue">Back-office</span></div>
         <div class="panel-body">
           <form method="post">
-            <?= csrf_field() ?>
+            <?= csrf_field() ?><input type="hidden" name="form_suivi" value="1">
             <div class="field-row">
               <div class="field">
                 <label for="statut">Statut du projet</label>
@@ -187,7 +327,7 @@ require_once __DIR__ . '/includes/header.php';
             <?php if ($u['role'] !== 'freelance'): ?>
               <div class="recap-row"><span>Client</span><strong><?= e($p['societe'] ?: $p['e_nom']) ?></strong></div>
             <?php endif; ?>
-            <div class="recap-row"><span>Budget estimé</span><strong><?= euros($p['budget_min']) ?> – <?= euros($p['budget_max']) ?></strong></div>
+            <div class="recap-row"><span>Budget estimé</span><strong><?= euros($p['budget_min']) ?> – <?= euros_max($p['budget_max']) ?></strong></div>
             <?php if ($p['montant_final']): ?>
               <div class="recap-row"><span>Montant validé</span><strong><?= euros($p['montant_final']) ?></strong></div>
             <?php endif; ?>

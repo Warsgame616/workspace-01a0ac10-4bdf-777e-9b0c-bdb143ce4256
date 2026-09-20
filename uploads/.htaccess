@@ -1,0 +1,6 @@
+# Les fichiers ne sont servis que via download.php (controle d'acces)
+# Les images de portfolio restent accessibles en lecture directe
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|cgi|pl|py|sh|htaccess)$">
+  Require all denied
+</FilesMatch>
+Options -Indexes

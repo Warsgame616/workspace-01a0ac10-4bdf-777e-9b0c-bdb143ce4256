@@ -136,7 +136,7 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="range-scale">
-                  <span>1 €</span><span>1 250 €</span><span>2 500 €</span><span>3 750 €</span><span>5 000 €</span>
+                  <span>1 €</span><span>1 250 €</span><span>2 500 €</span><span>3 750 €</span><span>5 000 €+</span>
                 </div>
               </div>
 

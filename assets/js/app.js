@@ -114,7 +114,7 @@ function initWizard(){
       ['Titre du projet', v('titre')],
       ['Catégorie', cat ? cat.options[cat.selectedIndex].text : '—'],
       ['Compétences requises', v('competences')],
-      ['Budget estimé', euroFmt(v('budget_min')) + ' – ' + euroFmt(v('budget_max'))],
+      ['Budget estimé', euroFmt(v('budget_min'), 5000) + ' – ' + euroFmt(v('budget_max'), 5000)],
       ['Délai souhaité', v('delai')],
       ['Date limite', v('date_limite')]
     ].map(r => '<div class="recap-row"><span>'+r[0]+'</span><strong>'+escapeHtml(r[1])+'</strong></div>').join('');
@@ -164,8 +164,10 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 /* ---------- Double curseur de budget (1 € – 5 000 €) ---------- */
-function euroFmt(n){
-  return Number(n).toLocaleString('fr-FR') + ' \u20AC';
+function euroFmt(n, max){
+  var v = Number(n);
+  var plus = (max !== undefined && v >= Number(max)) ? '+' : '';
+  return v.toLocaleString('fr-FR') + ' \u20AC' + plus;
 }
 
 function initBudgetRange(){
@@ -186,8 +188,8 @@ function initBudgetRange(){
       if (document.activeElement === min) { b = a; max.value = a; }
       else { a = b; min.value = b; }
     }
-    tMin.textContent = euroFmt(a);
-    tMax.textContent = euroFmt(b);
+    tMin.textContent = euroFmt(a, HI);
+    tMax.textContent = euroFmt(b, HI);
     var p1 = ((a - LO) / (HI - LO)) * 100;
     var p2 = ((b - LO) / (HI - LO)) * 100;
     fill.style.left  = p1 + '%';
@@ -197,4 +199,13 @@ function initBudgetRange(){
   min.addEventListener('input', render);
   max.addEventListener('input', render);
   render();
+}
+
+/* ---------- Aperçu d'image avant envoi ---------- */
+function previewImg(input, targetId){
+  var img = document.getElementById(targetId);
+  if (!img || !input.files || !input.files[0]) return;
+  var r = new FileReader();
+  r.onload = function(ev){ img.src = ev.target.result; img.classList.add('on'); };
+  r.readAsDataURL(input.files[0]);
 }
