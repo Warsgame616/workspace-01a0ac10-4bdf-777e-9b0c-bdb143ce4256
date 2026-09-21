@@ -3,9 +3,27 @@ require_once __DIR__ . '/includes/functions.php';
 if (is_logged()) { header('Location: ' . dashboard_url()); exit; }
 
 $erreur = '';
+/* Comptes de démonstration : connexion directe, sans jeton CSRF.
+   Les identifiants sont publics et affichés à l'écran : aucune donnée n'est exposée.
+   Cela garantit que les boutons fonctionnent même quand le navigateur bloque
+   le cookie de session (aperçu embarqué en iframe, cookies tiers refusés…). */
+$comptes_demo = [
+    'entreprise@test.fr'    => 'test123',
+    'marie@freelance.fr'    => 'test123',
+    'admin@workconnects.fr' => 'admin123',
+];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_check();
-    $u = login($_POST['email'] ?? '', $_POST['password'] ?? '');
+    $em = strtolower(trim($_POST['email'] ?? ''));
+    $pw = $_POST['password'] ?? '';
+    $est_demo = isset($_POST['demo'])
+             && isset($comptes_demo[$em])
+             && hash_equals($comptes_demo[$em], $pw);
+
+    // Le formulaire classique reste protégé contre le CSRF
+    if (!$est_demo) { csrf_check(); }
+
+    $u = login($em, $pw);
     if ($u) {
         header('Location: ' . dashboard_url($u['role']));
         exit;
@@ -57,7 +75,7 @@ require_once __DIR__ . '/includes/header.php';
       ];
       foreach ($demos as $d): ?>
         <form method="post" style="margin:0">
-          <?= csrf_field() ?>
+          <input type="hidden" name="demo" value="1">
           <input type="hidden" name="email" value="<?= e($d[3]) ?>">
           <input type="hidden" name="password" value="<?= e($d[4]) ?>">
           <button type="submit" class="demo-btn">

@@ -39,11 +39,29 @@ function csrf_token() {
 }
 function csrf_field() { return '<input type="hidden" name="csrf" value="' . csrf_token() . '">'; }
 function csrf_check() {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', $_POST['csrf'])) {
-            die('Requête invalide (CSRF).');
-        }
-    }
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') { return; }
+    if (isset($_POST['csrf']) && hash_equals($_SESSION['csrf'] ?? '', $_POST['csrf'])) { return; }
+
+    // Échec : le plus souvent la session a expiré ou le navigateur refuse le cookie.
+    http_response_code(400);
+    $retour = htmlspecialchars($_SERVER['HTTP_REFERER'] ?? 'index.php', ENT_QUOTES);
+    echo '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'
+       . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+       . '<title>Session expirée</title>'
+       . '<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;'
+       . 'background:#F8FAFC;color:#0F172A;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px}'
+       . '.b{max-width:460px;background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:32px;text-align:center}'
+       . 'h1{font-size:1.25rem;margin:0 0 10px}p{color:#64748B;font-size:.9375rem;line-height:1.6;margin:0 0 22px}'
+       . 'a{display:inline-block;padding:12px 22px;background:#165DFF;color:#fff;border-radius:10px;'
+       . 'text-decoration:none;font-weight:600;font-size:.9375rem}</style></head><body><div class="b">'
+       . '<div style="font-size:2.5rem;margin-bottom:12px">⏱️</div>'
+       . '<h1>Votre session a expiré</h1>'
+       . '<p>Par sécurité, le formulaire a été refusé car votre session n\'était plus active. '
+       . 'Cela arrive après une longue inactivité, ou si votre navigateur bloque les cookies. '
+       . 'Il suffit de recommencer.</p>'
+       . '<a href="' . $retour . '">Réessayer</a>'
+       . '</div></body></html>';
+    exit;
 }
 
 /* ---------- Authentification ---------- */
