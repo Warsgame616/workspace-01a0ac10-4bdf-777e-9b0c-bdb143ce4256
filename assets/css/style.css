@@ -430,14 +430,16 @@ tbody tr:hover{background:#FCFDFE}
   .header-cta .btn-primary{padding:9px 14px;font-size:.8125rem}
   .section{padding:56px 0}
   .grid-2,.grid-3,.grid-4,.steps,.field-row,.role-grid{grid-template-columns:1fr}
-  .app{grid-template-columns:1fr}
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr;min-height:0}
   .sidebar{
-    display:flex;gap:6px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);
+    display:flex;flex-direction:row;align-items:center;flex-wrap:nowrap;
+    gap:6px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);
     padding:10px 14px;position:sticky;top:68px;z-index:50;
+    min-height:0;height:auto;
   }
   .side-label{display:none}
   .side-link{white-space:nowrap;margin-bottom:0;padding:8px 13px;font-size:.875rem}
-  .side-logout{margin-top:0;padding-top:0;border-top:0;display:flex;align-items:center}
+  .side-logout{margin-top:0;padding-top:0;border-top:0;display:flex;align-items:center;flex-shrink:0}
   .main{padding:20px 16px}
   .chat{grid-template-columns:1fr;height:auto}
   .chat-list{max-height:210px;border-right:0;border-bottom:1px solid var(--line)}
@@ -447,9 +449,7 @@ tbody tr:hover{background:#FCFDFE}
   .wz-step .t{display:none}
   .hero-trust{gap:22px}
   .container,.container-sm{padding:0 16px}
-  /* Les 4 boutons du hero ne tiennent pas sur une ligne : on les empile */
-  .hero-actions{flex-direction:column;align-items:stretch}
-  .hero-actions .btn{width:100%}
+
   thead th,tbody td{padding:11px 14px}
   .auth-card{padding:26px 20px}
 }

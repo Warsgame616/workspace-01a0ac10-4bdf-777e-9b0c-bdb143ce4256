@@ -16,13 +16,6 @@ require_once __DIR__ . '/includes/header.php';
       </p>
       <div class="hero-actions">
         <a href="inscription.php?role=entreprise" class="btn btn-primary btn-lg">Décrire mon projet</a>
-        <?php if (!is_logged()): ?>
-          <a href="inscription.php" class="btn btn-outline btn-lg">Inscription</a>
-          <a href="connexion.php" class="btn btn-outline btn-lg">Connexion</a>
-        <?php else: ?>
-          <a href="<?= dashboard_url() ?>" class="btn btn-outline btn-lg">Mon espace</a>
-          <a href="deconnexion.php" class="btn btn-outline btn-lg">Déconnexion</a>
-        <?php endif; ?>
         <a href="entreprises.php" class="btn btn-ghost btn-lg">Comment ça marche</a>
       </div>
       <div class="hero-trust">
