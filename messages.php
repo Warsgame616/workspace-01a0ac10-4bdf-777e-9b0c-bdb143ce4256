@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
-if (!is_logged()) { header('Location: connexion.php'); exit; }
+if (!is_logged()) { header('Location: ' . u('connexion.php')); exit; }
 $u = user();
 $ADMIN_ID = 1;
 
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ->execute([$u['id'], $dest, $txt]);
         notify($dest, "Nouveau message de " . ($u['role']==='admin' ? 'WorkConnects' : trim($u['prenom'].' '.$u['nom'])) . ".", 'messages.php');
     }
-    header('Location: messages.php' . ($u['role']==='admin' ? '?c='.$dest : '')); exit;
+    header('Location: ' . u('messages.php' . ($u['role']==='admin' ? '?c='.$dest : ''))); exit;
 }
 
 // Marquer comme lus

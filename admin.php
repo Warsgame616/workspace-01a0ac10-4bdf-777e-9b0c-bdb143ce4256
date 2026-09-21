@@ -23,7 +23,7 @@ require_once __DIR__ . '/includes/header.php';
       <h1>Back-office WorkConnects</h1>
       <p>Pilotage global de la plateforme, des projets et des attributions.</p>
     </div>
-    <a href="<?= u('admin-parametres.php') ?>" class="btn btn-ghost">⚙️ Paramètres de matching</a>
+    <a href="admin-parametres.php" class="btn btn-ghost">⚙️ Paramètres de matching</a>
   </div>
 
   <?php if ($f = flash()): ?><div class="alert alert-<?= e($f['t']) ?>"><?= e($f['m']) ?></div><?php endif; ?>
@@ -39,7 +39,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="stat"><div class="lbl">Projets livrés</div><div class="val" style="color:var(--green)"><?= $s['termines'] ?></div><div class="sub">cumul</div></div>
     <div class="stat"><div class="lbl">Volume d'affaires</div><div class="val"><?= euros($s['ca']) ?></div><div class="sub">projets terminés</div></div>
     <div class="stat accent"><div class="lbl">Commissions encaissées</div><div class="val"><?= euros($s['commissions']) ?></div><div class="sub">taux : <?= param('commission',20) ?> %</div></div>
-    <div class="stat"><div class="lbl">Messages non lus</div><div class="val" style="color:var(--red)"><?= $s['messages_nl'] ?></div><div class="sub"><a href="<?= u('messages.php') ?>" style="color:var(--blue)">Traiter →</a></div></div>
+    <div class="stat"><div class="lbl">Messages non lus</div><div class="val" style="color:var(--red)"><?= $s['messages_nl'] ?></div><div class="sub"><a href="messages.php" style="color:var(--blue)">Traiter →</a></div></div>
   </div>
 
   <div class="panel mb-4">
@@ -76,7 +76,7 @@ require_once __DIR__ . '/includes/header.php';
   <div class="panel">
     <div class="panel-head">
       <h3>Projets en production</h3>
-      <a href="<?= u('admin-projets.php') ?>" class="btn btn-ghost btn-sm">Tous les projets</a>
+      <a href="admin-projets.php" class="btn btn-ghost btn-sm">Tous les projets</a>
     </div>
     <?php if (!$actifs): ?>
       <div class="empty" style="padding:36px"><div class="ico">📁</div><h3>Aucun projet en production</h3></div>

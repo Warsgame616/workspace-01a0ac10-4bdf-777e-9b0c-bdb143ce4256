@@ -2,14 +2,14 @@
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a href="<?= u('index.php') ?>" class="logo mb-2"><span class="logo-mark">W</span> WorkConnects</a>
+        <a href="index.php" class="logo mb-2"><span class="logo-mark">W</span> WorkConnects</a>
         <p class="small" style="max-width:300px">Vous décrivez le projet, on livre le résultat. Notre équipe sélectionne, pilote et garantit l'exécution de vos projets par des freelances qualifiés.</p>
       </div>
       <div>
         <h5>Plateforme</h5>
         <ul>
-          <li><a href="<?= u('entreprises.php') ?>">Pour les entreprises</a></li>
-          <li><a href="<?= u('freelances.php') ?>">Pour les freelances</a></li>
+          <li><a href="entreprises.php">Pour les entreprises</a></li>
+          <li><a href="freelances.php">Pour les freelances</a></li>
           <li><a href="index.php#methode">Notre méthode</a></li>
           <li><a href="index.php#tarifs">Tarifs</a></li>
         </ul>
@@ -18,14 +18,14 @@
         <h5>Ressources</h5>
         <ul>
           <li><a href="index.php#faq">Questions fréquentes</a></li>
-          <li><a href="<?= u('inscription.php') ?>">Créer un compte</a></li>
-          <li><a href="<?= u('connexion.php') ?>">Se connecter</a></li>
+          <li><a href="inscription.php">Créer un compte</a></li>
+          <li><a href="connexion.php">Se connecter</a></li>
         </ul>
       </div>
       <div>
         <h5>Légal</h5>
         <ul>
-          <li><a href="<?= u('mentions.php') ?>">Mentions légales</a></li>
+          <li><a href="mentions.php">Mentions légales</a></li>
           <li><a href="mentions.php#cgu">CGU / CGV</a></li>
           <li><a href="mentions.php#rgpd">Confidentialité / RGPD</a></li>
         </ul>

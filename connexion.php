@@ -52,7 +52,7 @@ require_once __DIR__ . '/includes/header.php';
     </form>
 
     <div class="auth-alt">
-      Pas encore de compte ? <a href="<?= u('inscription.php') ?>">Créer un compte</a>
+      Pas encore de compte ? <a href="inscription.php">Créer un compte</a>
     </div>
   </div>
 </div>

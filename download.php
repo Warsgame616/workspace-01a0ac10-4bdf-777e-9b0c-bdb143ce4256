@@ -6,7 +6,7 @@
  */
 require_once __DIR__ . '/includes/functions.php';
 
-if (!is_logged()) { header('Location: connexion.php'); exit; }
+if (!is_logged()) { header('Location: ' . u('connexion.php')); exit; }
 $u  = user();
 $id = (int)($_GET['id'] ?? 0);
 

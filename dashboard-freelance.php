@@ -38,7 +38,7 @@ require_once __DIR__ . '/includes/header.php';
       <h1>Bonjour <?= e($u['prenom'] ?: $u['nom']) ?> 👋</h1>
       <p><?= e($u['titre_pro']) ?> — vos missions et propositions en cours.</p>
     </div>
-    <a href="<?= u('profil.php') ?>" class="btn btn-ghost">Mettre à jour mon profil</a>
+    <a href="profil.php" class="btn btn-ghost">Mettre à jour mon profil</a>
   </div>
 
   <?php if ($f = flash()): ?><div class="alert alert-<?= e($f['t']) ?>"><?= e($f['m']) ?></div><?php endif; ?>
@@ -78,7 +78,7 @@ require_once __DIR__ . '/includes/header.php';
                   <?php endforeach; ?>
                 </div>
               </div>
-              <a href="<?= u('messages.php') ?>" class="btn btn-ghost btn-sm">Je suis intéressé</a>
+              <a href="messages.php" class="btn btn-ghost btn-sm">Je suis intéressé</a>
             </div>
           <?php endforeach; ?>
           </div>
@@ -88,7 +88,7 @@ require_once __DIR__ . '/includes/header.php';
       <div class="panel">
         <div class="panel-head">
           <h3>Mes missions</h3>
-          <a href="<?= u('projets.php') ?>" class="btn btn-ghost btn-sm">Tout voir</a>
+          <a href="projets.php" class="btn btn-ghost btn-sm">Tout voir</a>
         </div>
         <?php if (!$missions): ?>
           <div class="empty" style="padding:36px 24px">
@@ -145,7 +145,7 @@ require_once __DIR__ . '/includes/header.php';
               <span><?= e($c) ?></span>
             <?php endforeach; ?>
           </div>
-          <a href="<?= u('profil.php') ?>" class="btn btn-ghost btn-block mt-3">Modifier mon profil</a>
+          <a href="profil.php" class="btn btn-ghost btn-block mt-3">Modifier mon profil</a>
         </div>
       </div>
 
@@ -157,7 +157,7 @@ require_once __DIR__ . '/includes/header.php';
             <div><h4 style="font-size:.9375rem">Sophie Dupont</h4><p class="small muted">Responsable de compte</p></div>
           </div>
           <p class="small muted mb-3">Toutes vos questions passent par votre chargé de compte. Aucun contact direct avec le client final.</p>
-          <a href="<?= u('messages.php') ?>" class="btn btn-primary btn-block">💬 Envoyer un message</a>
+          <a href="messages.php" class="btn btn-primary btn-block">💬 Envoyer un message</a>
         </div>
       </div>
     </div>

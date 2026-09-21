@@ -23,7 +23,7 @@ require_once __DIR__ . '/includes/header.php';
   </div>
 
   <div class="flex gap-1 wrap mb-3">
-    <a href="<?= u('admin-projets.php') ?>" class="btn <?= !$filtre?'btn-primary':'btn-ghost' ?> btn-sm">Tous</a>
+    <a href="admin-projets.php" class="btn <?= !$filtre?'btn-primary':'btn-ghost' ?> btn-sm">Tous</a>
     <?php foreach (['nouveau','analyse','attribue','en_cours','livraison','termine','annule'] as $s): ?>
       <a href="admin-projets.php?s=<?= $s ?>" class="btn <?= $filtre===$s?'btn-primary':'btn-ghost' ?> btn-sm"><?= statut_label($s) ?></a>
     <?php endforeach; ?>

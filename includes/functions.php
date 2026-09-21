@@ -3,6 +3,10 @@
 require_once __DIR__ . '/db.php';
 
 if (session_status() === PHP_SESSION_NONE) {
+    // Nom de session court et uniforme : c'est aussi le paramètre d'URL
+    // utilisé en repli quand le navigateur bloque les cookies (?sid=...).
+    session_name('sid');
+
     // En HTTPS (et notamment dans un aperçu embarqué en iframe), les navigateurs
     // n'acceptent le cookie de session que s'il est marqué SameSite=None; Secure.
     $host = $_SERVER['HTTP_HOST'] ?? '';
@@ -27,6 +31,17 @@ if (session_status() === PHP_SESSION_NONE) {
     if (empty($_COOKIE[session_name()]) && $sid
         && preg_match('/^[A-Za-z0-9,\-]{20,128}$/', $sid)) {
         session_id($sid);
+        // Le cookie est refusé : PHP réécrit lui-même TOUS les liens et
+        // formulaires internes pour y propager l'identifiant de session.
+        // Indispensable pour les liens construits dynamiquement
+        // (ex. admin-matching.php?id=12), que l'on ne peut pas traiter un à un.
+        ini_set('session.use_cookies',      '0');
+        ini_set('session.use_only_cookies', '0');
+        ini_set('session.use_trans_sid',    '1');
+        ini_set('session.trans_sid_tags',   'a=href,area=href,frame=src,form=');
+        $h = $_SERVER['HTTP_HOST'] ?? '';
+        if ($h !== '') { ini_set('session.trans_sid_hosts', $h); }
+        @ini_set('url_rewriter.tags',       'a=href,area=href,frame=src,form=');
     }
     session_start();
 }
@@ -135,8 +150,8 @@ function role() { $u = user(); return $u ? $u['role'] : null; }
 
 function require_role($roles) {
     $roles = (array)$roles;
-    if (!is_logged()) { header('Location: connexion.php'); exit; }
-    if (!in_array(role(), $roles, true)) { header('Location: index.php'); exit; }
+    if (!is_logged()) { header('Location: ' . u('connexion.php')); exit; }
+    if (!in_array(role(), $roles, true)) { header('Location: ' . u('index.php')); exit; }
 }
 
 function login($email, $password) {

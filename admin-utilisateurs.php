@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         db()->prepare("UPDATE users SET actif = 1 - actif WHERE id=?")->execute([$uid]);
         flash("Statut du compte mis à jour.");
     }
-    header('Location: admin-utilisateurs.php'); exit;
+    header('Location: ' . u('admin-utilisateurs.php')); exit;
 }
 
 $r = $_GET['r'] ?? '';
@@ -34,11 +34,11 @@ require_once __DIR__ . '/includes/header.php';
   <?php if ($f = flash()): ?><div class="alert alert-<?= e($f['t']) ?>"><?= e($f['m']) ?></div><?php endif; ?>
 
   <div class="flex gap-1 wrap mb-3">
-    <a href="<?= u('admin-utilisateurs.php') ?>" class="btn <?= !$r?'btn-primary':'btn-ghost' ?> btn-sm">Tous</a>
-    <a href="<?= u('admin-utilisateurs.php?r=entreprise') ?>" class="btn <?= $r==='entreprise'?'btn-primary':'btn-ghost' ?> btn-sm">Entreprises</a>
-    <a href="<?= u('admin-utilisateurs.php?r=particulier') ?>" class="btn <?= $r==='particulier'?'btn-primary':'btn-ghost' ?> btn-sm">Particuliers</a>
-    <a href="<?= u('admin-utilisateurs.php?r=freelance') ?>" class="btn <?= $r==='freelance'?'btn-primary':'btn-ghost' ?> btn-sm">Freelances</a>
-    <a href="<?= u('admin-utilisateurs.php?r=admin') ?>" class="btn <?= $r==='admin'?'btn-primary':'btn-ghost' ?> btn-sm">Administration</a>
+    <a href="admin-utilisateurs.php" class="btn <?= !$r?'btn-primary':'btn-ghost' ?> btn-sm">Tous</a>
+    <a href="admin-utilisateurs.php?r=entreprise" class="btn <?= $r==='entreprise'?'btn-primary':'btn-ghost' ?> btn-sm">Entreprises</a>
+    <a href="admin-utilisateurs.php?r=particulier" class="btn <?= $r==='particulier'?'btn-primary':'btn-ghost' ?> btn-sm">Particuliers</a>
+    <a href="admin-utilisateurs.php?r=freelance" class="btn <?= $r==='freelance'?'btn-primary':'btn-ghost' ?> btn-sm">Freelances</a>
+    <a href="admin-utilisateurs.php?r=admin" class="btn <?= $r==='admin'?'btn-primary':'btn-ghost' ?> btn-sm">Administration</a>
   </div>
 
   <div class="panel">

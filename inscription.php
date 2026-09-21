@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $uid = db()->lastInsertId();
             notify($uid, "Bienvenue sur WorkConnects. Votre chargé de compte vous contactera sous 48 h.", 'index.php');
             notify(admin_id(), "Nouvelle inscription : " . $nom . " (" . $role . ").", 'admin.php');
-            header('Location: connexion.php?inscrit=1'); exit;
+            header('Location: ' . u('connexion.php?inscrit=1')); exit;
         }
     }
     $role_pre = $role ?: $role_pre;
@@ -175,7 +175,7 @@ require_once __DIR__ . '/includes/header.php';
       <button type="submit" class="btn btn-primary btn-block btn-lg">Créer mon compte</button>
     </form>
 
-    <div class="auth-alt">Déjà inscrit ? <a href="<?= u('connexion.php') ?>">Se connecter</a></div>
+    <div class="auth-alt">Déjà inscrit ? <a href="connexion.php">Se connecter</a></div>
   </div>
 </div>
 

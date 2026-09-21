@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
-if (!is_logged()) { header('Location: connexion.php'); exit; }
+if (!is_logged()) { header('Location: ' . u('connexion.php')); exit; }
 $u = user();
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             flash("Mot de passe modifié.");
         }
     }
-    header('Location: profil.php'); exit;
+    header('Location: ' . u('profil.php')); exit;
 }
 
 $titre = "Mon profil";
@@ -217,8 +217,8 @@ require_once __DIR__ . '/includes/header.php';
       </div>
       <div class="flex gap-1 wrap">
         <a href="mentions.php#rgpd" class="btn btn-ghost btn-sm">Politique de confidentialité</a>
-        <a href="<?= u('messages.php') ?>" class="btn btn-ghost btn-sm">Demander l'export de mes données</a>
-        <a href="<?= u('messages.php') ?>" class="btn btn-ghost btn-sm">Demander la suppression du compte</a>
+        <a href="messages.php" class="btn btn-ghost btn-sm">Demander l'export de mes données</a>
+        <a href="messages.php" class="btn btn-ghost btn-sm">Demander la suppression du compte</a>
       </div>
     </div></div>
   </div>

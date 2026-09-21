@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
-if (!is_logged()) { header('Location: connexion.php'); exit; }
+if (!is_logged()) { header('Location: ' . u('connexion.php')); exit; }
 $u = user();
 $filtre = $_GET['s'] ?? '';
 
@@ -8,7 +8,7 @@ if (est_client($u['role'])) {
     $sql = "SELECT p.*, f.nom AS f_nom, f.prenom AS f_prenom FROM projets p LEFT JOIN users f ON f.id=p.freelance_id WHERE p.entreprise_id=?";
 } elseif ($u['role']==='freelance') {
     $sql = "SELECT p.*, e.societe FROM projets p LEFT JOIN users e ON e.id=p.entreprise_id WHERE p.freelance_id=?";
-} else { header('Location: admin-projets.php'); exit; }
+} else { header('Location: ' . u('admin-projets.php')); exit; }
 
 $args = [$u['id']];
 if ($filtre) { $sql .= " AND p.statut=?"; $args[] = $filtre; }
@@ -29,12 +29,12 @@ require_once __DIR__ . '/includes/header.php';
       <p><?= count($projets) ?> résultat<?= count($projets)>1?'s':'' ?></p>
     </div>
     <?php if (est_client($u['role'])): ?>
-      <a href="<?= u('nouveau-projet.php') ?>" class="btn btn-primary">➕ Nouveau projet</a>
+      <a href="nouveau-projet.php" class="btn btn-primary">➕ Nouveau projet</a>
     <?php endif; ?>
   </div>
 
   <div class="flex gap-1 wrap mb-3">
-    <a href="<?= u('projets.php') ?>" class="btn <?= !$filtre?'btn-primary':'btn-ghost' ?> btn-sm">Tous</a>
+    <a href="projets.php" class="btn <?= !$filtre?'btn-primary':'btn-ghost' ?> btn-sm">Tous</a>
     <?php foreach (['nouveau','analyse','attribue','en_cours','livraison','termine'] as $s): ?>
       <a href="projets.php?s=<?= $s ?>" class="btn <?= $filtre===$s?'btn-primary':'btn-ghost' ?> btn-sm"><?= statut_label($s) ?></a>
     <?php endforeach; ?>
@@ -44,7 +44,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="panel"><div class="empty">
       <div class="ico">📁</div><h3>Aucun projet</h3>
       <p>Aucun projet ne correspond à ce filtre.</p>
-      <?php if (est_client($u['role'])): ?><a href="<?= u('nouveau-projet.php') ?>" class="btn btn-primary">Créer un projet</a><?php endif; ?>
+      <?php if (est_client($u['role'])): ?><a href="nouveau-projet.php" class="btn btn-primary">Créer un projet</a><?php endif; ?>
     </div></div>
   <?php else: ?>
     <div class="grid grid-2">

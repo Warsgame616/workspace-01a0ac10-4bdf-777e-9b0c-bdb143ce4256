@@ -13,7 +13,7 @@ require_once __DIR__ . '/includes/header.php';
       WorkConnects prend l'intégralité de la chaîne en charge.
     </p>
     <div class="hero-actions" style="justify-content:center">
-      <a href="<?= u('inscription.php?role=entreprise') ?>" class="btn btn-primary btn-lg">Créer mon compte entreprise</a>
+      <a href="inscription.php?role=entreprise" class="btn btn-primary btn-lg">Créer mon compte entreprise</a>
       <a href="#processus" class="btn btn-ghost btn-lg">Voir le processus</a>
     </div>
   </div>
@@ -91,7 +91,7 @@ require_once __DIR__ . '/includes/header.php';
       <h2>Décrivez votre projet dès maintenant</h2>
       <p>Gratuit et sans engagement. Vous recevez une proposition argumentée sous 48 heures.</p>
       <div class="cta-actions">
-        <a href="<?= u('inscription.php?role=entreprise') ?>" class="btn btn-white btn-lg">Créer mon compte entreprise</a>
+        <a href="inscription.php?role=entreprise" class="btn btn-white btn-lg">Créer mon compte entreprise</a>
       </div>
     </div>
   </div>

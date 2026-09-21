@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ->execute([$pid, $u['id'],
               "Bonjour, nous avons bien reçu votre projet « $t ». Notre équipe analyse votre besoin et revient vers vous sous 48 heures avec une proposition d'expert et une estimation budgétaire."]);
         flash("Projet envoyé. Notre équipe revient vers vous sous 48 heures.");
-        header('Location: projet.php?id='.$pid); exit;
+        header('Location: ' . u('projet.php?id=' . $pid)); exit;
     }
 }
 
@@ -174,7 +174,7 @@ require_once __DIR__ . '/includes/header.php';
       <div class="wz-nav">
         <button type="button" class="btn btn-ghost" id="wzPrev">← Précédent</button>
         <div style="display:flex;gap:10px">
-          <a href="<?= u('dashboard-entreprise.php') ?>" class="btn btn-ghost">Annuler</a>
+          <a href="dashboard-entreprise.php" class="btn btn-ghost">Annuler</a>
           <button type="button" class="btn btn-primary" id="wzNext">Continuer →</button>
           <button type="submit" class="btn btn-primary" id="wzSubmit" style="display:none">Envoyer le projet</button>
         </div>

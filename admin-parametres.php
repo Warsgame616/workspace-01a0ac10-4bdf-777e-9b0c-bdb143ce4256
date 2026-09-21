@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $st->execute([$k, max(0, (int)($_POST[$k] ?? 0))]);
     }
     flash("Paramètres enregistrés. Le moteur de matching utilise désormais ces coefficients.");
-    header('Location: admin-parametres.php'); exit;
+    header('Location: ' . u('admin-parametres.php')); exit;
 }
 
 $titre = "Paramètres";

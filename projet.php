@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
-if (!is_logged()) { header('Location: connexion.php'); exit; }
+if (!is_logged()) { header('Location: ' . u('connexion.php')); exit; }
 $u = user();
 $id = (int)($_GET['id'] ?? 0);
 
@@ -12,11 +12,11 @@ $st = db()->prepare("SELECT p.*, e.societe, e.nom AS e_nom, e.prenom AS e_prenom
                      WHERE p.id = ?");
 $st->execute([$id]);
 $p = $st->fetch();
-if (!$p) { header('Location: ' . dashboard_url()); exit; }
+if (!$p) { header('Location: ' . dashboard_url(null, true)); exit; }
 
 // Contrôle d'accès strict : seuls le client, l'expert affecté et l'admin peuvent voir
 $autorise = ($u['role']==='admin') || ($p['entreprise_id']==$u['id']) || ($p['freelance_id']==$u['id']);
-if (!$autorise) { header('Location: ' . dashboard_url()); exit; }
+if (!$autorise) { header('Location: ' . dashboard_url(null, true)); exit; }
 
 // Téléversement d'un livrable (tous les intervenants du projet)
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_fichier'])) {
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_fichier'])) {
     } else {
         flash($r['erreur'], 'error');
     }
-    header('Location: projet.php?id='.$id); exit;
+    header('Location: ' . u('projet.php?id=' . $id)); exit;
 }
 
 // Suppression d'un fichier (son auteur ou l'administrateur)
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['suppr_fichier'])) {
             flash("Fichier supprimé.");
         }
     }
-    header('Location: projet.php?id='.$id); exit;
+    header('Location: ' . u('projet.php?id=' . $id)); exit;
 }
 
 // Évaluation du projet livré (par le client)
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_eval'])) {
             flash("Merci, votre évaluation a bien été enregistrée.");
         }
     }
-    header('Location: projet.php?id='.$id); exit;
+    header('Location: ' . u('projet.php?id=' . $id)); exit;
 }
 
 // Mise à jour (admin uniquement)
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $u['role']==='admin' && isset($_POST[
     notify($p['entreprise_id'], "Mise à jour du projet « ".$p['titre']." » : ".statut_label($_POST['statut'])." (".(int)$_POST['avancement']." %).", 'projet.php?id='.$id);
     if ($p['freelance_id']) notify($p['freelance_id'], "Mise à jour de la mission « ".$p['titre']." ».", 'projet.php?id='.$id);
     flash("Projet mis à jour.");
-    header('Location: projet.php?id='.$id); exit;
+    header('Location: ' . u('projet.php?id=' . $id)); exit;
 }
 
 $fs = db()->prepare("SELECT f.*, u.nom AS u_nom, u.prenom AS u_prenom, u.role AS u_role
@@ -141,7 +141,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
     <div class="flex gap-1 wrap">
       <span class="badge <?= statut_classe($p['statut']) ?>" style="padding:8px 14px;font-size:.875rem"><?= statut_label($p['statut']) ?></span>
-      <a href="<?= u('messages.php') ?>" class="btn btn-primary">💬 Contacter WorkConnects</a>
+      <a href="messages.php" class="btn btn-primary">💬 Contacter WorkConnects</a>
     </div>
   </div>
 

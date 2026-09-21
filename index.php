@@ -15,8 +15,8 @@ require_once __DIR__ . '/includes/header.php';
         et vous garantit un livrable conforme, dans les délais.
       </p>
       <div class="hero-actions">
-        <a href="<?= u('inscription.php') ?>" class="btn btn-primary btn-lg">Décrire mon projet</a>
-        <a href="<?= u('entreprises.php') ?>" class="btn btn-ghost btn-lg">Comment ça marche</a>
+        <a href="inscription.php" class="btn btn-primary btn-lg">Décrire mon projet</a>
+        <a href="entreprises.php" class="btn btn-ghost btn-lg">Comment ça marche</a>
       </div>
       <div class="hero-trust">
         <div><strong>48 h</strong><span>Proposition d'expert</span></div>
@@ -130,7 +130,7 @@ require_once __DIR__ . '/includes/header.php';
         <li>✓ Tableau de bord de suivi en temps réel</li>
         <li>✓ Facturation unique et simplifiée</li>
       </ul>
-      <a href="<?= u('entreprises.php') ?>" class="btn btn-primary">Découvrir l'offre entreprise</a>
+      <a href="entreprises.php" class="btn btn-primary">Découvrir l'offre entreprise</a>
     </div>
     <div class="card">
       <span class="badge badge-gray mb-2">Freelances</span>
@@ -142,7 +142,7 @@ require_once __DIR__ . '/includes/header.php';
         <li>✓ Paiement garanti et sécurisé</li>
         <li>✓ Interlocuteur unique côté WorkConnects</li>
       </ul>
-      <a href="<?= u('freelances.php') ?>" class="btn btn-ghost">Découvrir l'offre freelance</a>
+      <a href="freelances.php" class="btn btn-ghost">Découvrir l'offre freelance</a>
     </div>
   </div>
 </section>
@@ -234,8 +234,8 @@ require_once __DIR__ . '/includes/header.php';
       <h2>Prêt à lancer votre prochain projet ?</h2>
       <p>Décrivez votre besoin en 5 minutes. Notre équipe revient vers vous sous 48 heures avec une proposition concrète.</p>
       <div class="cta-actions">
-        <a href="<?= u('inscription.php?role=entreprise') ?>" class="btn btn-white btn-lg">Décrire mon projet</a>
-        <a href="<?= u('connexion.php') ?>" class="btn btn-outline-white btn-lg">Accéder à mon espace</a>
+        <a href="inscription.php?role=entreprise" class="btn btn-white btn-lg">Décrire mon projet</a>
+        <a href="connexion.php" class="btn btn-outline-white btn-lg">Accéder à mon espace</a>
       </div>
     </div>
   </div>
