@@ -35,9 +35,9 @@ require_once __DIR__ . '/includes/header.php';
       <div class="stat"><div class="lbl">Factures payées</div><div class="val"><?= count(array_filter($factures, fn($f)=>$f['statut']==='payee')) ?></div><div class="sub">réglées</div></div>
       <div class="stat accent"><div class="lbl">En attente</div><div class="val"><?= euros(array_sum(array_map(fn($f)=>$f['statut']!=='payee'?$f['montant_ht']:0, $factures))) ?></div><div class="sub">à régler</div></div>
     <?php elseif ($u['role']==='freelance'): ?>
-      <div class="stat"><div class="lbl">Chiffre d'affaires brut</div><div class="val"><?= euros($tot_ht) ?></div><div class="sub">missions facturées</div></div>
-      <div class="stat"><div class="lbl">Commission plateforme</div><div class="val" style="color:var(--muted)"><?= euros($tot_com) ?></div><div class="sub"><?= param('commission',20) ?> %</div></div>
-      <div class="stat accent"><div class="lbl">Revenus nets</div><div class="val"><?= euros($tot_net) ?></div><div class="sub">versés ou à venir</div></div>
+      <div class="stat"><div class="lbl">Missions facturées</div><div class="val"><?= count($factures) ?></div><div class="sub">au total</div></div>
+      <div class="stat accent"><div class="lbl">Vos revenus</div><div class="val"><?= euros($tot_net) ?></div><div class="sub">versés ou à venir</div></div>
+      <div class="stat"><div class="lbl">Réglées</div><div class="val"><?= count(array_filter($factures, fn($f)=>$f['statut']==='payee')) ?></div><div class="sub">factures payées</div></div>
     <?php else: ?>
       <div class="stat"><div class="lbl">Volume facturé</div><div class="val"><?= euros($tot_ht) ?></div><div class="sub">toutes entreprises</div></div>
       <div class="stat accent"><div class="lbl">Commissions WorkConnects</div><div class="val"><?= euros($tot_com) ?></div><div class="sub">marge brute</div></div>
@@ -46,8 +46,8 @@ require_once __DIR__ . '/includes/header.php';
   </div>
 
   <div class="alert alert-info">
-    💳 L'architecture de paiement est en place (séquestre, échéancier, reversement, facturation automatique)
-    mais aucun flux financier réel n'est activé dans cette version.
+    💳 Les règlements se font en deux temps : validation de la proposition, puis règlement du projet.
+    Le raccordement à un prestataire de paiement reste à activer.
   </div>
 
   <div class="panel">
@@ -60,8 +60,8 @@ require_once __DIR__ . '/includes/header.php';
         <thead><tr>
           <th>Facture</th><th>Projet</th>
           <?php if ($u['role']==='admin'): ?><th>Client</th><?php endif; ?>
-          <th>Montant HT</th>
-          <?php if ($u['role']!=='entreprise'): ?><th>Commission</th><th>Net expert</th><?php endif; ?>
+          <th><?= $u['role']==='freelance' ? 'Votre montant' : 'Montant' ?></th>
+          <?php if ($u['role']==='admin'): ?><th>Frais de service</th><th>Net expert</th><?php endif; ?>
           <th>Statut</th><th>Date</th>
         </tr></thead>
         <tbody>
@@ -70,9 +70,9 @@ require_once __DIR__ . '/includes/header.php';
             <td class="t-title"><?= e($f['numero']) ?></td>
             <td class="small"><?= e($f['titre']) ?></td>
             <?php if ($u['role']==='admin'): ?><td class="small"><?= e($f['societe'] ?? '—') ?></td><?php endif; ?>
-            <td class="strong"><?= euros($f['montant_ht']) ?></td>
-            <?php if ($u['role']!=='entreprise'): ?>
-              <td class="small muted">−<?= euros($f['commission']) ?></td>
+            <td class="strong"><?= euros($u['role']==='freelance' ? $f['montant_freelance'] : $f['montant_ht']) ?></td>
+            <?php if ($u['role']==='admin'): ?>
+              <td class="small muted"><?= euros($f['commission']) ?></td>
               <td class="strong" style="color:var(--green)"><?= euros($f['montant_freelance']) ?></td>
             <?php endif; ?>
             <td><span class="badge <?= $f['statut']==='payee'?'badge-green':'badge-amber' ?>"><?= $f['statut']==='payee'?'Payée':'En attente' ?></span></td>

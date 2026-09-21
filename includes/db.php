@@ -106,6 +106,17 @@ function install_schema(PDO $pdo) {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS paiements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        projet_id INTEGER NOT NULL REFERENCES projets(id),
+        type TEXT NOT NULL,              -- 'frais' (etape 1) ou 'projet' (etape 2)
+        montant INTEGER DEFAULT 0,       -- ce que l'entreprise regle
+        statut TEXT DEFAULT 'a_payer',   -- a_payer | en_suspens | libere | rembourse | paye
+        reference TEXT DEFAULT '',
+        paye_le TEXT DEFAULT '',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS factures (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         projet_id INTEGER NOT NULL REFERENCES projets(id),

@@ -47,7 +47,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="stat"><div class="lbl">Missions en cours</div><div class="val" style="color:var(--blue)"><?= $en_cours ?></div><div class="sub">actives actuellement</div></div>
     <div class="stat"><div class="lbl">Missions terminées</div><div class="val"><?= $termine ?></div><div class="sub">sur la plateforme</div></div>
     <div class="stat"><div class="lbl">Note moyenne</div><div class="val"><?= number_format($u['note_moyenne'],1,',','') ?> <span style="font-size:1rem;color:var(--muted)">/5</span></div><div class="sub stars"><?= str_repeat('★', (int)round($u['note_moyenne'])) ?></div></div>
-    <div class="stat accent"><div class="lbl">Revenus nets perçus</div><div class="val"><?= euros($revenus) ?></div><div class="sub">après commission de 20 %</div></div>
+    <div class="stat accent"><div class="lbl">Revenus nets perçus</div><div class="val"><?= euros($revenus) ?></div><div class="sub">montant net de vos missions</div></div>
   </div>
 
   <div class="grid" style="grid-template-columns:1.7fr 1fr;gap:24px;align-items:start">

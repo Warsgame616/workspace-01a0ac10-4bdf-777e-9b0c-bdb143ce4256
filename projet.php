@@ -81,19 +81,43 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_eval'])) {
 }
 
 // Mise à jour (admin uniquement)
+/* Règlement des échéances par l'entreprise (étapes 1 et 2). */
+if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_paiement'])) {
+    csrf_check();
+    if (!est_client($u['role']) || $p['entreprise_id'] != $u['id']) {
+        header('Location: ' . u('projet.php?id=' . $id)); exit;
+    }
+    $type = $_POST['type_paiement'] ?? '';
+    if (in_array($type, ['frais','projet'], true)) {
+        regler_paiement($id, $type);
+        if ($type === 'frais') {
+            db()->prepare("UPDATE projets SET statut='en_cours' WHERE id=? AND statut='attribue'")->execute([$id]);
+            notify(admin_id(), "Proposition validée par le client sur « ".$p['titre']." ».", 'projet.php?id='.$id);
+            if ($p['freelance_id']) notify($p['freelance_id'], "La mission « ".$p['titre']." » est confirmée, vous pouvez démarrer.", 'projet.php?id='.$id);
+            flash("Proposition validée. La mission démarre.");
+        } else {
+            notify(admin_id(), "Règlement du projet « ".$p['titre']." » reçu.", 'projet.php?id='.$id);
+            flash("Règlement enregistré. Merci.");
+        }
+    }
+    header('Location: ' . u('projet.php?id=' . $id)); exit;
+}
+
 if ($_SERVER['REQUEST_METHOD']==='POST' && $u['role']==='admin' && isset($_POST['form_suivi'])) {
     csrf_check();
     db()->prepare("UPDATE projets SET statut=?, avancement=?, montant_final=? WHERE id=?")
         ->execute([$_POST['statut'], (int)$_POST['avancement'], (int)$_POST['montant_final'], $id]);
     if ($_POST['statut']==='termine') {
-        $m = (int)$_POST['montant_final'];
-        $com = (int)round($m * (param('commission',20)/100));
+        // Le montant saisi est ce que perçoit l'expert ; les frais s'y ajoutent.
+        $d = decomposer_montant((int)$_POST['montant_final']);
+        liberer_frais($id);   // prestation livrée : frais acquis, plus remboursables
         $ex = db()->prepare("SELECT COUNT(*) FROM factures WHERE projet_id=?"); $ex->execute([$id]);
         if (!$ex->fetchColumn()) {
             db()->prepare("INSERT INTO factures (projet_id,numero,montant_ht,commission,montant_freelance,statut) VALUES (?,?,?,?,?,'en_attente')")
-                ->execute([$id, 'FA-'.date('Y').'-'.str_pad($id,4,'0',STR_PAD_LEFT), $m, $com, $m-$com]);
+                ->execute([$id, 'FA-'.date('Y').'-'.str_pad($id,4,'0',STR_PAD_LEFT), $d['total'], $d['frais'], $d['base']]);
         }
     }
+    if ($_POST['statut']==='annule') { rembourser_frais($id); }
     notify($p['entreprise_id'], "Mise à jour du projet « ".$p['titre']." » : ".statut_label($_POST['statut'])." (".(int)$_POST['avancement']." %).", 'projet.php?id='.$id);
     if ($p['freelance_id']) notify($p['freelance_id'], "Mise à jour de la mission « ".$p['titre']." ».", 'projet.php?id='.$id);
     flash("Projet mis à jour.");
@@ -304,7 +328,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="field">
               <label for="montant_final">Montant final validé (€ HT)</label>
               <input type="number" name="montant_final" id="montant_final" class="input" min="0" step="100" value="<?= (int)$p['montant_final'] ?>">
-              <div class="hint">Le passage au statut « Terminé » génère automatiquement la facture et la commission de <?= param('commission',20) ?> %.</div>
+              <div class="hint">Le montant saisi est celui versé à l'expert. Le passage à « Terminé » génère la facture et libère les frais de service.</div>
             </div>
             <div class="flex gap-1 wrap">
               <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -337,6 +361,93 @@ require_once __DIR__ . '/includes/header.php';
           </div>
         </div>
       </div>
+
+      <?php
+      /* ── Échéances de paiement (entreprise uniquement) ────────────────
+         Aucun taux ni aucune répartition n'est affiché : le client ne voit
+         que ce qu'il doit régler. Le détail reste dans le back-office. */
+      $pay = paiements_projet($id);
+      if (est_client($u['role']) && $pay):
+        $pf = $pay['frais']  ?? null;
+        $pp = $pay['projet'] ?? null;
+      ?>
+      <div class="panel">
+        <div class="panel-head"><h3>Règlement</h3></div>
+        <div class="panel-body">
+
+          <?php if ($pf && $pf['statut'] === 'a_payer'): ?>
+            <div class="pay-step">
+              <div class="pay-num">1</div>
+              <div class="pay-body">
+                <h4>Valider la proposition</h4>
+                <p class="small muted">Frais de service à régler pour lancer la mission. Ce montant est conservé jusqu'à la livraison et vous est remboursé si le projet est annulé.</p>
+                <div class="pay-amount"><?= euros($pf['montant']) ?></div>
+                <form method="post" class="mt-1">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="form_paiement" value="1">
+                  <input type="hidden" name="type_paiement" value="frais">
+                  <button class="btn btn-primary btn-block">Accepter et régler</button>
+                </form>
+              </div>
+            </div>
+          <?php elseif ($pf): ?>
+            <div class="pay-step done">
+              <div class="pay-num">✓</div>
+              <div class="pay-body">
+                <h4>Proposition validée</h4>
+                <p class="small muted">
+                  <?= euros($pf['montant']) ?> —
+                  <?= $pf['statut']==='rembourse' ? 'remboursés'
+                      : ($pf['statut']==='libere' ? 'acquis à la livraison'
+                      : 'conservés jusqu\'à la livraison') ?>
+                </p>
+              </div>
+            </div>
+          <?php endif; ?>
+
+          <?php if ($pp): ?>
+            <?php if ($pp['statut'] === 'a_payer' && $pf && $pf['statut'] !== 'a_payer'): ?>
+              <div class="pay-step">
+                <div class="pay-num">2</div>
+                <div class="pay-body">
+                  <h4>Régler le projet</h4>
+                  <p class="small muted">Montant de la prestation.</p>
+                  <div class="pay-amount"><?= euros($pp['montant']) ?></div>
+                  <form method="post" class="mt-1">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="form_paiement" value="1">
+                    <input type="hidden" name="type_paiement" value="projet">
+                    <button class="btn btn-primary btn-block">Régler <?= euros($pp['montant']) ?></button>
+                  </form>
+                </div>
+              </div>
+            <?php elseif ($pp['statut'] === 'paye'): ?>
+              <div class="pay-step done">
+                <div class="pay-num">✓</div>
+                <div class="pay-body">
+                  <h4>Projet réglé</h4>
+                  <p class="small muted"><?= euros($pp['montant']) ?></p>
+                </div>
+              </div>
+            <?php else: ?>
+              <div class="pay-step pending">
+                <div class="pay-num">2</div>
+                <div class="pay-body">
+                  <h4>Règlement du projet</h4>
+                  <p class="small muted">Disponible après validation de la proposition.</p>
+                </div>
+              </div>
+            <?php endif; ?>
+          <?php endif; ?>
+
+          <?php if ($pf && $pp): ?>
+            <div class="recap mt-2">
+              <div class="recap-row total"><span>Total du projet</span><strong><?= euros($pf['montant'] + $pp['montant']) ?></strong></div>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endif; ?>
 
       <div class="panel">
         <div class="panel-head"><h3>Expert affecté</h3></div>
@@ -372,8 +483,8 @@ require_once __DIR__ . '/includes/header.php';
             <div class="recap">
               <div class="recap-row"><span>N° facture</span><strong><?= e($fac['numero']) ?></strong></div>
               <div class="recap-row"><span>Montant HT</span><strong><?= euros($fac['montant_ht']) ?></strong></div>
-              <?php if ($u['role']!=='entreprise'): ?>
-                <div class="recap-row"><span>Commission</span><strong><?= euros($fac['commission']) ?></strong></div>
+              <?php if ($u['role']==='admin'): ?>
+                <div class="recap-row"><span>Frais de service</span><strong><?= euros($fac['commission']) ?></strong></div>
                 <div class="recap-row"><span>Net expert</span><strong><?= euros($fac['montant_freelance']) ?></strong></div>
               <?php endif; ?>
               <div class="recap-row"><span>Statut</span><strong><span class="badge <?= $fac['statut']==='payee'?'badge-green':'badge-amber' ?>"><?= $fac['statut']==='payee'?'Payée':'En attente' ?></span></strong></div>

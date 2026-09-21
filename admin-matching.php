@@ -15,11 +15,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($fid) {
         db()->prepare("UPDATE projets SET freelance_id=?, statut='attribue', avancement=5 WHERE id=?")->execute([$fid, $id]);
         $fs = db()->prepare("SELECT * FROM users WHERE id=?"); $fs->execute([$fid]); $fl = $fs->fetch();
+
+        // Le tarif du freelance sert de base ; les frais de service s'y ajoutent.
+        $base = (int) ($fl['tarif_projet'] ?: round(($projet['budget_min'] + $projet['budget_max']) / 2));
+        $d    = decomposer_montant($base);
+        creer_paiement($id, 'frais',  $d['frais'], 'a_payer');   // étape 1
+        creer_paiement($id, 'projet', $d['base'],  'a_payer');   // étape 2
+
         notify($fid, "Nouvelle mission attribuée : « ".$projet['titre']." ».", 'projet.php?id='.$id);
-        notify($projet['entreprise_id'], "Un expert a été sélectionné pour votre projet « ".$projet['titre']." ».", 'projet.php?id='.$id);
+        notify($projet['entreprise_id'], "Un expert a été sélectionné pour votre projet « ".$projet['titre']." ». Validez la proposition pour lancer la mission.", 'projet.php?id='.$id);
         db()->prepare("INSERT INTO messages (projet_id,expediteur_id,destinataire_id,contenu) VALUES (?,1,?,?)")
             ->execute([$id, $projet['entreprise_id'],
-              "Bonne nouvelle : nous avons sélectionné l'expert pour votre projet « ".$projet['titre']." ». La mission démarre et vous pourrez suivre l'avancement depuis votre tableau de bord."]);
+              "Bonne nouvelle : nous avons sélectionné l'expert pour votre projet « ".$projet['titre']." ». Validez la proposition depuis le détail du projet pour lancer la mission."]);
         db()->prepare("INSERT INTO messages (projet_id,expediteur_id,destinataire_id,contenu) VALUES (?,1,?,?)")
             ->execute([$id, $fid,
               "Bonjour ".($fl['prenom'] ?: $fl['nom']).", nous vous attribuons la mission « ".$projet['titre']." ». Le cahier des charges est disponible dans le détail du projet. Je reste votre interlocuteur unique."]);

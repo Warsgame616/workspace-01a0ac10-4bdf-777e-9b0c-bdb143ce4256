@@ -19,8 +19,8 @@ require_once __DIR__ . '/includes/header.php';
       <p class="small mb-2"><strong>1. Objet.</strong> WorkConnects fournit un service d'intermédiation et de pilotage de projets entre des entreprises clientes et des prestataires indépendants sélectionnés par ses soins.</p>
       <p class="small mb-2"><strong>2. Rôle de la plateforme.</strong> WorkConnects sélectionne le prestataire, cadre le besoin, pilote l'exécution et contrôle le livrable. L'entreprise cliente n'a pas à rechercher elle-même de prestataire.</p>
       <p class="small mb-2"><strong>3. Communication.</strong> Sauf accord contraire, les échanges entre l'entreprise cliente et le prestataire transitent par le chargé de compte WorkConnects afin d'assurer la traçabilité et la qualité du suivi.</p>
-      <p class="small mb-2"><strong>4. Tarification.</strong> La publication d'un besoin et son étude sont gratuites. Une commission, dont le taux par défaut est de 20 % du montant du projet, est appliquée au lancement de la mission.</p>
-      <p class="small mb-2"><strong>5. Facturation.</strong> Une facture unique est émise par WorkConnects à l'entreprise cliente. Le prestataire est réglé selon l'échéancier contractuel après déduction de la commission.</p>
+      <p class="small mb-2"><strong>4. Tarification.</strong> La publication d'un besoin et son étude sont gratuites. Des frais de service, indiqués au client avant validation, s'ajoutent au montant de la prestation. Le prestataire perçoit l'intégralité du tarif convenu.</p>
+      <p class="small mb-2"><strong>5. Facturation.</strong> Une facture unique est émise par WorkConnects à l'entreprise cliente. Le prestataire est réglé selon l'échéancier contractuel, sans retenue sur le tarif convenu.</p>
       <p class="small"><strong>6. Qualité.</strong> Chaque livrable fait l'objet d'un contrôle avant transmission. En cas de non-conformité, WorkConnects organise les corrections ou la réattribution de la mission.</p>
     </div></div>
 

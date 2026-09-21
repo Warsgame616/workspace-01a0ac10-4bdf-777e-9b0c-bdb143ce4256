@@ -193,7 +193,7 @@ require_once __DIR__ . '/includes/header.php';
       <div class="card" style="border-color:var(--blue);box-shadow:var(--sh-md)">
         <span class="badge badge-blue mb-2">Le plus courant</span>
         <h3>Projet piloté</h3>
-        <p class="mt-1" style="font-size:2rem;font-weight:800;color:var(--ink)">20 <span style="font-size:1rem;font-weight:600;color:var(--muted)">% de commission</span></p>
+        <p class="mt-1" style="font-size:2rem;font-weight:800;color:var(--ink)">Devis <span style="font-size:1rem;font-weight:600;color:var(--muted)">clair et sans surprise</span></p>
         <p class="small mt-2">Sélection de l'expert, pilotage complet, contrôle qualité, sécurisation du paiement et facturation unique.</p>
       </div>
       <div class="card">

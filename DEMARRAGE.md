@@ -82,3 +82,37 @@ neuve est recréée avec le seul compte administrateur.
 Deux éléments à sauvegarder régulièrement :
 - `data/workconnects.sqlite` — toutes les données
 - `uploads/` — les fichiers livrés et les portfolios
+
+
+## 7. Modèle de paiement
+
+**Les frais de service sont payés par l'entreprise, pas par le freelance.**
+
+Un freelance qui annonce 100 € touche 100 €. L'entreprise règle 120 €
+(avec un taux à 20 %). Le taux n'est affiché nulle part côté client ni
+côté freelance : il n'apparaît que dans le back-office.
+
+### Les deux échéances
+
+| Étape | Quand | Montant | Rôle |
+|---|---|---|---|
+| 1. Validation | À l'attribution de l'expert | Frais de service | Lance la mission |
+| 2. Règlement | Après validation | Prix de la prestation | Rémunère l'expert |
+
+Les frais de l'étape 1 restent **en suspens** pendant toute la durée du
+projet :
+
+- projet livré → statut `libere`, les frais sont acquis
+- projet annulé → statut `rembourse`, les frais sont rendus au client
+
+### Modifier le taux
+
+Back-office → Paramètres → Commission. La valeur s'applique aux
+nouvelles attributions ; les projets en cours conservent leur montant.
+
+### Raccordement à un prestataire de paiement
+
+Les règlements sont enregistrés en base mais aucun flux bancaire n'est
+déclenché. Pour encaisser réellement, il faut brancher un prestataire
+(Stripe Connect est adapté à ce modèle à trois parties) sur la fonction
+`regler_paiement()` dans `includes/functions.php`.

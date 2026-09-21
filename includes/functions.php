@@ -207,6 +207,77 @@ function flash($msg = null, $type = 'success') {
     return null;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   PAIEMENTS EN DEUX ÉTAPES
+   Le tarif annoncé par le freelance lui est intégralement versé.
+   Les frais de service (commission) s'AJOUTENT par-dessus et sont
+   réglés par l'entreprise. Cette répartition n'est visible que
+   dans le back-office : côté entreprise, seul le total apparaît.
+   ───────────────────────────────────────────────────────────── */
+
+/** Taux de frais de service en % (paramétrable dans l'admin). */
+function taux_frais() { return (float) param('commission', 20); }
+
+/**
+ * Décompose un montant de mission.
+ * @param int $base Montant revenant au freelance (son prix).
+ * @return array{base:int,frais:int,total:int}
+ */
+function decomposer_montant($base) {
+    $base  = max(0, (int) $base);
+    $frais = (int) round($base * (taux_frais() / 100));
+    return ['base' => $base, 'frais' => $frais, 'total' => $base + $frais];
+}
+
+/** Les deux paiements d'un projet, indexés par type. */
+function paiements_projet($projet_id) {
+    $st = db()->prepare("SELECT * FROM paiements WHERE projet_id=? ORDER BY id");
+    $st->execute([$projet_id]);
+    $out = [];
+    foreach ($st->fetchAll() as $r) { $out[$r['type']] = $r; }
+    return $out;
+}
+
+/** Crée l'échéance demandée si elle n'existe pas déjà. */
+function creer_paiement($projet_id, $type, $montant, $statut = 'a_payer') {
+    $st = db()->prepare("SELECT COUNT(*) FROM paiements WHERE projet_id=? AND type=?");
+    $st->execute([$projet_id, $type]);
+    if ($st->fetchColumn()) { return false; }
+    db()->prepare("INSERT INTO paiements (projet_id,type,montant,statut) VALUES (?,?,?,?)")
+        ->execute([$projet_id, $type, (int) $montant, $statut]);
+    return true;
+}
+
+/**
+ * Enregistre un règlement.
+ * Les frais de service restent « en suspens » pendant toute la durée du
+ * projet : ils ne sont acquis qu'à la livraison, et restent remboursables
+ * tant que le projet n'est pas terminé.
+ */
+function regler_paiement($projet_id, $type) {
+    $statut = ($type === 'frais') ? 'en_suspens' : 'paye';
+    db()->prepare("UPDATE paiements SET statut=?, paye_le=CURRENT_TIMESTAMP, reference=? WHERE projet_id=? AND type=? AND statut='a_payer'")
+        ->execute([$statut, strtoupper($type[0]) . '-' . date('Ymd') . '-' . str_pad($projet_id, 4, '0', STR_PAD_LEFT), $projet_id, $type]);
+}
+
+/** Libère les frais en suspens : la prestation est livrée. */
+function liberer_frais($projet_id) {
+    db()->prepare("UPDATE paiements SET statut='libere' WHERE projet_id=? AND type='frais' AND statut='en_suspens'")
+        ->execute([$projet_id]);
+}
+
+/** Rembourse les frais en suspens (projet annulé). */
+function rembourser_frais($projet_id) {
+    db()->prepare("UPDATE paiements SET statut='rembourse' WHERE projet_id=? AND type='frais' AND statut IN ('en_suspens','a_payer')")
+        ->execute([$projet_id]);
+}
+
+/** Étape 1 réglée ? Conditionne le démarrage de la mission. */
+function frais_regles($projet_id) {
+    $p = paiements_projet($projet_id);
+    return isset($p['frais']) && in_array($p['frais']['statut'], ['en_suspens','libere'], true);
+}
+
 /** Identifiant du compte administrateur (robuste même après suppression du n°1). */
 function admin_id() {
     static $id = null;
