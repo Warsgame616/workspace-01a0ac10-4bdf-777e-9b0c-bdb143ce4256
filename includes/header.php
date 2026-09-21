@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/functions.php';
+// Empêche le navigateur de réafficher une version périmée de la page
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 $u = user();
 $page = $page ?? '';
 $titre = $titre ?? 'WorkConnects';

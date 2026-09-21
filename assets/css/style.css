@@ -589,3 +589,6 @@ tbody tr:hover{background:#FCFDFE}
 /* Grille de rôles à 3 colonnes */
 .role-grid-3{grid-template-columns:repeat(3,1fr)}
 @media(max-width:600px){ .role-grid-3{grid-template-columns:1fr} }
+
+/* Les accès démo sont des liens : même rendu que les boutons */
+a.demo-btn{text-decoration:none;color:inherit}

@@ -13,6 +13,22 @@ $comptes_demo = [
     'admin@workconnects.fr' => 'admin123',
 ];
 
+/* Accès démo par simple lien : connexion.php?demo=entreprise
+   Fonctionne sans cookie, sans JavaScript et sans POST : c'est la méthode
+   la plus robuste dans un aperçu embarqué où les cookies tiers sont bloqués. */
+$raccourcis = [
+    'entreprise' => 'entreprise@test.fr',
+    'freelance'  => 'marie@freelance.fr',
+    'admin'      => 'admin@workconnects.fr',
+];
+if (isset($_GET['demo']) && isset($raccourcis[$_GET['demo']])) {
+    $em = $raccourcis[$_GET['demo']];
+    if ($x = login($em, $comptes_demo[$em])) {
+        header('Location: ' . dashboard_url($x['role']));
+        exit;
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $em = strtolower(trim($_POST['email'] ?? ''));
     $pw = $_POST['password'] ?? '';
@@ -69,20 +85,15 @@ require_once __DIR__ . '/includes/header.php';
       <h5>Comptes de démonstration — connexion en un clic</h5>
       <?php
       $demos = [
-        ['🏢', 'Espace entreprise',        'Nexora Industries',     'entreprise@test.fr',      'test123'],
-        ['👩‍💻', 'Espace freelance',         'Marie Leroy',           'marie@freelance.fr',      'test123'],
-        ['🛡️', 'Back-office WorkConnects', 'Administration',        'admin@workconnects.fr',   'admin123'],
+        ['🏢',  'entreprise', 'Espace entreprise',        'Nexora Industries'],
+        ['👩‍💻', 'freelance',  'Espace freelance',         'Marie Leroy'],
+        ['🛡️',  'admin',      'Back-office WorkConnects', 'Administration'],
       ];
       foreach ($demos as $d): ?>
-        <form method="post" style="margin:0">
-          <input type="hidden" name="demo" value="1">
-          <input type="hidden" name="email" value="<?= e($d[3]) ?>">
-          <input type="hidden" name="password" value="<?= e($d[4]) ?>">
-          <button type="submit" class="demo-btn">
-            <span style="font-size:1.125rem"><?= $d[0] ?></span>
-            <span><strong><?= e($d[1]) ?></strong><span><?= e($d[2]) ?> — <?= e($d[3]) ?></span></span>
-          </button>
-        </form>
+        <a href="connexion.php?demo=<?= $d[1] ?>" class="demo-btn">
+          <span style="font-size:1.125rem"><?= $d[0] ?></span>
+          <span><strong><?= e($d[2]) ?></strong><span><?= e($d[3]) ?></span></span>
+        </a>
       <?php endforeach; ?>
     </div>
 
