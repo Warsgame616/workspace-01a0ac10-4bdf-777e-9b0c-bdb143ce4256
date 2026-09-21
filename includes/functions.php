@@ -5,7 +5,13 @@ require_once __DIR__ . '/db.php';
 if (session_status() === PHP_SESSION_NONE) {
     // En HTTPS (et notamment dans un aperçu embarqué en iframe), les navigateurs
     // n'acceptent le cookie de session que s'il est marqué SameSite=None; Secure.
-    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $local = (strpos($host, 'localhost') === 0) || (strpos($host, '127.0.0.1') === 0);
+    // Hors développement local, le site est servi en HTTPS (hébergeur ou aperçu
+    // embarqué). Le cookie doit alors être Secure + SameSite=None, sinon les
+    // navigateurs le refusent dans une iframe et la session ne tient pas.
+    $https = !$local
+          || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
           || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
           || (($_SERVER['SERVER_PORT'] ?? '') == 443);
     session_set_cookie_params([
@@ -15,7 +21,21 @@ if (session_status() === PHP_SESSION_NONE) {
         'secure'   => $https,
         'samesite' => $https ? 'None' : 'Lax',
     ]);
+    // Repli : si le navigateur bloque les cookies, l'identifiant de session est
+    // relayé par l'URL. PHP le reprend alors automatiquement.
+    $sid = $_GET['sid'] ?? $_POST['sid'] ?? '';
+    if (empty($_COOKIE[session_name()]) && $sid
+        && preg_match('/^[A-Za-z0-9,\-]{20,128}$/', $sid)) {
+        session_id($sid);
+    }
     session_start();
+}
+
+/** Ajoute l'identifiant de session à une URL quand le cookie est refusé. */
+function u($url) {
+    if (!empty($_COOKIE[session_name()]) || empty($_SESSION['uid'])) { return $url; }
+    if (strpos($url, 'sid=') !== false || strpos($url, '://') !== false) { return $url; }
+    return $url . (strpos($url, '?') === false ? '?' : '&') . 'sid=' . urlencode(session_id());
 }
 
 // Initialise la base et les données de démonstration dès le premier accès au site
@@ -33,14 +53,50 @@ if (!function_exists('mb_strtolower')){ function mb_strtolower($s, $e = null){ r
 /* ---------- Sécurité / helpers ---------- */
 function e($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-function csrf_token() {
-    if (empty($_SESSION['csrf'])) { $_SESSION['csrf'] = bin2hex(random_bytes(16)); }
-    return $_SESSION['csrf'];
+/** Clé de signature, persistée dans /data (hors racine web). */
+function csrf_secret() {
+    static $k = null;
+    if ($k !== null) return $k;
+    $f = __DIR__ . '/../data/.csrf_key';
+    if (is_file($f)) { $k = trim(file_get_contents($f)); }
+    if (empty($k)) {
+        $k = bin2hex(random_bytes(32));
+        if (!is_dir(dirname($f))) { @mkdir(dirname($f), 0755, true); }
+        @file_put_contents($f, $k);
+        @chmod($f, 0600);
+    }
+    return $k;
 }
-function csrf_field() { return '<input type="hidden" name="csrf" value="' . csrf_token() . '">'; }
+
+/**
+ * Jeton CSRF signé (HMAC) et horodaté.
+ * Il ne dépend PAS de la session : les formulaires restent utilisables même
+ * quand le navigateur refuse les cookies (aperçu en iframe, cookies tiers
+ * bloqués). La signature empêche toute falsification.
+ */
+function csrf_token() {
+    $t = time();
+    return $t . '.' . hash_hmac('sha256', (string)$t, csrf_secret());
+}
+function csrf_field() {
+    $h = '<input type="hidden" name="csrf" value="' . csrf_token() . '">';
+    // Relaie aussi la session quand le cookie est bloqué
+    if (empty($_COOKIE[session_name()]) && !empty($_SESSION['uid'])) {
+        $h .= '<input type="hidden" name="sid" value="' . htmlspecialchars(session_id(), ENT_QUOTES) . '">';
+    }
+    return $h;
+}
+function csrf_valide($jeton) {
+    if (!is_string($jeton) || strpos($jeton, '.') === false) { return false; }
+    [$t, $sig] = explode('.', $jeton, 2);
+    if (!ctype_digit($t)) { return false; }
+    if (abs(time() - (int)$t) > 86400) { return false; }          // valable 24 h
+    return hash_equals(hash_hmac('sha256', $t, csrf_secret()), $sig);
+}
+
 function csrf_check() {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') { return; }
-    if (isset($_POST['csrf']) && hash_equals($_SESSION['csrf'] ?? '', $_POST['csrf'])) { return; }
+    if (csrf_valide($_POST['csrf'] ?? '')) { return; }
 
     // Échec : le plus souvent la session a expiré ou le navigateur refuse le cookie.
     http_response_code(400);
@@ -96,14 +152,15 @@ function login($email, $password) {
 }
 function logout() { $_SESSION = []; session_destroy(); }
 
-function dashboard_url($role = null) {
+function dashboard_url($role = null, $avec_sid = false) {
     $role = $role ?: role();
-    return match ($role) {
+    $url = match ($role) {
         'admin'                     => 'admin.php',
         'entreprise', 'particulier' => 'dashboard-entreprise.php',
         'freelance'                 => 'dashboard-freelance.php',
         default                     => 'index.php',
     };
+    return $avec_sid ? u($url) : $url;
 }
 
 /** Un client est une entreprise OU un particulier : même parcours, même espace. */

@@ -13,7 +13,7 @@ require_once __DIR__ . '/includes/header.php';
       Le reste — cadrage, relation client, facturation — est géré par notre équipe.
     </p>
     <div class="hero-actions" style="justify-content:center">
-      <a href="inscription.php?role=freelance" class="btn btn-primary btn-lg">Rejoindre le réseau</a>
+      <a href="<?= u('inscription.php?role=freelance') ?>" class="btn btn-primary btn-lg">Rejoindre le réseau</a>
       <a href="#criteres" class="btn btn-ghost btn-lg">Critères de sélection</a>
     </div>
   </div>
@@ -107,7 +107,7 @@ require_once __DIR__ . '/includes/header.php';
       <h2>Rejoignez le réseau WorkConnects</h2>
       <p>Candidature gratuite. Vous ne payez aucun frais d'inscription ni d'abonnement.</p>
       <div class="cta-actions">
-        <a href="inscription.php?role=freelance" class="btn btn-white btn-lg">Créer mon profil freelance</a>
+        <a href="<?= u('inscription.php?role=freelance') ?>" class="btn btn-white btn-lg">Créer mon profil freelance</a>
       </div>
     </div>
   </div>

@@ -27,7 +27,7 @@ require_once __DIR__ . '/includes/header.php';
       <h1>Bonjour <?= e($u['prenom'] ?: $u['nom']) ?> 👋</h1>
       <p><?= e($u['societe'] ?: 'Votre espace entreprise') ?> — suivez l'avancement de vos projets en temps réel.</p>
     </div>
-    <a href="nouveau-projet.php" class="btn btn-primary">➕ Nouveau projet</a>
+    <a href="<?= u('nouveau-projet.php') ?>" class="btn btn-primary">➕ Nouveau projet</a>
   </div>
 
   <?php if ($f = flash()): ?><div class="alert alert-<?= e($f['t']) ?>"><?= e($f['m']) ?></div><?php endif; ?>
@@ -43,14 +43,14 @@ require_once __DIR__ . '/includes/header.php';
     <div class="panel">
       <div class="panel-head">
         <h3>Mes projets</h3>
-        <a href="projets.php" class="btn btn-ghost btn-sm">Tout voir</a>
+        <a href="<?= u('projets.php') ?>" class="btn btn-ghost btn-sm">Tout voir</a>
       </div>
       <?php if (!$projets): ?>
         <div class="empty">
           <div class="ico">📁</div>
           <h3>Aucun projet pour le moment</h3>
           <p>Décrivez votre premier besoin, notre équipe s'occupe du reste.</p>
-          <a href="nouveau-projet.php" class="btn btn-primary">Créer mon premier projet</a>
+          <a href="<?= u('nouveau-projet.php') ?>" class="btn btn-primary">Créer mon premier projet</a>
         </div>
       <?php else: ?>
       <div class="table-wrap">
@@ -97,7 +97,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
           </div>
           <p class="small muted mb-3">Votre interlocuteur unique pour tous vos projets. Réponse garantie sous 4 heures ouvrées.</p>
-          <a href="messages.php" class="btn btn-primary btn-block">💬 Envoyer un message</a>
+          <a href="<?= u('messages.php') ?>" class="btn btn-primary btn-block">💬 Envoyer un message</a>
         </div>
       </div>
 

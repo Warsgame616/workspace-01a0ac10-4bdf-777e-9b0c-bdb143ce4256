@@ -47,11 +47,11 @@ require_once __DIR__ . '/includes/header.php';
 
   <div class="page-head">
     <div>
-      <p class="small muted mb-1"><a href="admin.php" style="color:var(--blue)">← Retour au back-office</a></p>
+      <p class="small muted mb-1"><a href="<?= u('admin.php') ?>" style="color:var(--blue)">← Retour au back-office</a></p>
       <h1>Matching — <?= e($projet['titre']) ?></h1>
       <p>Classement des experts selon les critères mesurables configurés.</p>
     </div>
-    <a href="admin-parametres.php" class="btn btn-ghost">Ajuster les coefficients</a>
+    <a href="<?= u('admin-parametres.php') ?>" class="btn btn-ghost">Ajuster les coefficients</a>
   </div>
 
   <div class="grid" style="grid-template-columns:1fr 320px;gap:24px;align-items:start">
@@ -148,7 +148,7 @@ require_once __DIR__ . '/includes/header.php';
               <span><?= $lab ?></span><strong><?= $coefs[$k] ?> %</strong>
             </div>
           <?php endforeach; ?>
-          <a href="admin-parametres.php" class="btn btn-ghost btn-block mt-3 btn-sm">Modifier</a>
+          <a href="<?= u('admin-parametres.php') ?>" class="btn btn-ghost btn-block mt-3 btn-sm">Modifier</a>
         </div>
       </div>
     </div>

@@ -7,3 +7,4 @@ uploads/portfolio/*
 __pycache__/
 *.pyc
 .DS_Store
+data/.csrf_key

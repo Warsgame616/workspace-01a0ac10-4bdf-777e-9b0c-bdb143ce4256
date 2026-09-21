@@ -141,7 +141,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
     <div class="flex gap-1 wrap">
       <span class="badge <?= statut_classe($p['statut']) ?>" style="padding:8px 14px;font-size:.875rem"><?= statut_label($p['statut']) ?></span>
-      <a href="messages.php" class="btn btn-primary">💬 Contacter WorkConnects</a>
+      <a href="<?= u('messages.php') ?>" class="btn btn-primary">💬 Contacter WorkConnects</a>
     </div>
   </div>
 
