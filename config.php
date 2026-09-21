@@ -13,6 +13,19 @@
 define('ADMIN_EMAIL',    'admin@workconnects.fr');
 define('ADMIN_PASSWORD', 'admin123');   // ⚠️ À CHANGER avant mise en ligne
 
+// ---- Comptes de test ----
+// true  : crée aussi un compte entreprise et un compte freelance de test
+//         à la première ouverture (pratique pour essayer la plateforme).
+// false : seul le compte administrateur est créé.
+// ⚠️ Passez à false avant la mise en ligne, puis supprimez
+//    data/workconnects.sqlite pour repartir d'une base propre.
+define('COMPTES_TEST', true);
+
+define('TEST_ENTREPRISE_EMAIL',    'entreprise@test.fr');
+define('TEST_ENTREPRISE_PASSWORD', 'test123');
+define('TEST_FREELANCE_EMAIL',     'freelance@test.fr');
+define('TEST_FREELANCE_PASSWORD',  'test123');
+
 // ---- Identité du site ----
 define('SITE_NOM',    'WorkConnects');
 define('SITE_EMAIL',  'contact@workconnects.fr');

@@ -160,11 +160,33 @@ function param($cle, $defaut = 0) {
  * remplissent avec les vrais comptes, projets et messages.
  */
 function seed_data(PDO $pdo) {
-    $st = $pdo->prepare("INSERT INTO users (email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,titre_pro,bio,competences,tarif_projet,experience,disponibilite,note_moyenne,nb_missions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $cols = "email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,"
+          . "titre_pro,bio,competences,tarif_projet,experience,disponibilite,note_moyenne,nb_missions";
+    $st = $pdo->prepare("INSERT INTO users ($cols) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+
+    // --- Compte administrateur (toujours créé) ---
     $st->execute([
-        ADMIN_EMAIL,
-        password_hash(ADMIN_PASSWORD, PASSWORD_DEFAULT),
+        ADMIN_EMAIL, password_hash(ADMIN_PASSWORD, PASSWORD_DEFAULT),
         'admin', 'Administrateur', 'WorkConnects', '', 'WorkConnects', '', '', '',
         'Responsable de compte', '', '', 0, 0, '', 0, 0,
+    ]);
+
+    // --- Comptes de test (désactivables dans config.php) ---
+    if (!defined('COMPTES_TEST') || !COMPTES_TEST) { return; }
+
+    // Entreprise de test
+    $st->execute([
+        TEST_ENTREPRISE_EMAIL, password_hash(TEST_ENTREPRISE_PASSWORD, PASSWORD_DEFAULT),
+        'entreprise', 'Martin', 'Julien', '0611223344',
+        'Atelier Martin', '81234567800021', 'Artisanat', '10-50',
+        '', "Atelier d'ébénisterie sur mesure.", '', 0, 0, '', 0, 0,
+    ]);
+
+    // Freelance de test
+    $st->execute([
+        TEST_FREELANCE_EMAIL, password_hash(TEST_FREELANCE_PASSWORD, PASSWORD_DEFAULT),
+        'freelance', 'Leroy', 'Marie', '0633445566', '', '', '', '',
+        'Développeuse Web', "Développeuse web spécialisée sites vitrines et e-commerce.",
+        'PHP,JavaScript,HTML,CSS,WordPress,SEO', 2500, 6, 'disponible', 0, 0,
     ]);
 }

@@ -17,6 +17,29 @@ define('ADMIN_PASSWORD', 'un-mot-de-passe-solide');
 > Si vous les modifiez ensuite, supprimez `data/workconnects.sqlite`
 > pour repartir d'une base neuve.
 
+## 1 bis. Comptes de test
+
+Trois comptes sont créés à la première ouverture :
+
+| Rôle | Identifiant | Mot de passe |
+|---|---|---|
+| Administrateur | `admin@workconnects.fr` | `admin123` |
+| Entreprise | `entreprise@test.fr` | `test123` |
+| Freelance | `freelance@test.fr` | `test123` |
+
+Ils servent à parcourir la plateforme dans les trois rôles sans rien saisir.
+Aucun projet, message ni facture fictif : les tableaux de bord restent à zéro.
+
+**Avant la mise en ligne**, désactivez les deux comptes de test dans
+`config.php` :
+
+```php
+define('COMPTES_TEST', false);
+```
+
+puis supprimez `data/workconnects.sqlite` pour repartir d'une base propre.
+Seul le compte administrateur sera recréé.
+
 ## 2. Installation sur l'hébergeur
 
 1. Envoyez tous les fichiers dans le dossier public (`public_html`).
