@@ -14,7 +14,7 @@ $titre = $titre ?? 'WorkConnects';
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($titre) ?> — WorkConnects</title>
 <meta name="description" content="WorkConnects : vous décrivez le projet, on livre le résultat. Plateforme B2B de gestion de projets avec freelances sélectionnés et pilotés par notre équipe.">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
 </head>
 <body>
 

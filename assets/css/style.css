@@ -594,8 +594,8 @@ tbody tr:hover{background:#FCFDFE}
 a.demo-btn{text-decoration:none;color:inherit}
 
 /* Bouton secondaire contour (CTA hero) */
-.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.btn-outline:hover{background:var(--bg-2);border-color:var(--ink-2)}
+.btn-outline{background:#fff;color:#0F172A;border:1px solid #CBD5E1}
+.btn-outline:hover{background:#F1F5F9;border-color:#94A3B8}
 
 /* Déconnexion en pied de barre latérale */
 .side-logout{margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}

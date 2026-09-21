@@ -46,6 +46,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/**
+ * URL d'un fichier statique suffixée par sa date de modification.
+ * Le navigateur recharge automatiquement la feuille de style ou le script
+ * dès qu'on les modifie, sans avoir à vider le cache manuellement.
+ */
+function asset($chemin) {
+    $abs = __DIR__ . '/../' . ltrim($chemin, '/');
+    $v   = is_file($abs) ? filemtime($abs) : time();
+    return $chemin . '?v=' . $v;
+}
+
 /** Ajoute l'identifiant de session à une URL quand le cookie est refusé. */
 function u($url) {
     if (!empty($_COOKIE[session_name()]) || empty($_SESSION['uid'])) { return $url; }
