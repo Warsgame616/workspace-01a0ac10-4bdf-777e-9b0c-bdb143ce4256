@@ -42,7 +42,7 @@ $total = (int)param('coef_competences',40)+(int)param('coef_budget',25)+(int)par
         <?php
         $ch = [
           ['coef_competences','Correspondance des compétences','Part des compétences requises présentes sur le profil.'],
-          ['coef_budget','Adéquation budgétaire','Compatibilité du TJM projeté avec le budget du projet.'],
+          ['coef_budget','Adéquation budgétaire','Compatibilité du tarif habituel du freelance avec le budget du projet.'],
           ['coef_dispo','Disponibilité','Disponible = 100, partiel = 50, occupé = 10.'],
           ['coef_experience','Années d\'expérience','Normalisé sur 10 ans maximum.'],
           ['coef_note','Note moyenne','Moyenne des évaluations sur 5, ramenée sur 100.'],

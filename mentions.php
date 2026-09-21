@@ -27,7 +27,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="panel" id="rgpd"><div class="panel-body">
       <h2 style="font-size:1.25rem" class="mb-2">Politique de confidentialité (RGPD)</h2>
       <p class="small mb-2"><strong>Responsable de traitement :</strong> WorkConnects SAS.</p>
-      <p class="small mb-2"><strong>Données collectées :</strong> identité, coordonnées professionnelles, informations de profil (secteur, compétences, TJM, disponibilité) et données relatives aux projets.</p>
+      <p class="small mb-2"><strong>Données collectées :</strong> identité, coordonnées professionnelles, informations de profil (secteur, compétences, tarif, disponibilité) et données relatives aux projets.</p>
       <p class="small mb-2"><strong>Finalités :</strong> création et gestion du compte, qualification et attribution des projets, suivi de mission, facturation, assistance.</p>
       <p class="small mb-2"><strong>Base légale :</strong> exécution du contrat et intérêt légitime de la plateforme.</p>
       <p class="small mb-2"><strong>Durée de conservation :</strong> 3 ans à compter du dernier contact, hors obligations comptables légales.</p>

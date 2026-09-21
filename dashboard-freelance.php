@@ -135,7 +135,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
           </div>
           <div class="recap">
-            <div class="recap-row"><span>TJM</span><strong><?= euros($u['tjm']) ?></strong></div>
+            <div class="recap-row"><span>Tarif par projet</span><strong><?= euros($u['tarif_projet']) ?></strong></div>
             <div class="recap-row"><span>Expérience</span><strong><?= (int)$u['experience'] ?> ans</strong></div>
             <div class="recap-row"><span>Disponibilité</span><strong><?= ucfirst(e($u['disponibilite'])) ?></strong></div>
             <div class="recap-row"><span>Missions réalisées</span><strong><?= (int)$u['nb_missions'] ?></strong></div>

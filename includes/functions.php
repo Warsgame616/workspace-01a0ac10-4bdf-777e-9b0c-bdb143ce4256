@@ -274,11 +274,13 @@ function calculer_matching($projet) {
         $match = $requises ? count(array_intersect($requises, $skills)) / count($requises) : 0;
         $detail['competences'] = round($match * 100);
 
-        // 2. Adéquation budgétaire (TJM projeté vs budget)
-        $cout_estime = $f['tjm'] * 30;
-        if ($budget_moy <= 0) { $sb = 50; }
-        elseif ($cout_estime <= $budget_moy) { $sb = 100; }
-        else { $sb = max(0, 100 - (($cout_estime - $budget_moy) / $budget_moy) * 100); }
+        // 2. Adéquation budgétaire : le tarif par projet se compare
+        //    directement au budget annoncé par le client.
+        $tarif = (int) $f['tarif_projet'];
+        if ($budget_moy <= 0)      { $sb = 50; }   // budget inconnu : neutre
+        elseif ($tarif <= 0)       { $sb = 50; }   // tarif non renseigné : neutre
+        elseif ($tarif <= $budget_moy) { $sb = 100; }
+        else { $sb = max(0, 100 - (($tarif - $budget_moy) / $budget_moy) * 100); }
         $detail['budget'] = round($sb);
 
         // 3. Disponibilité

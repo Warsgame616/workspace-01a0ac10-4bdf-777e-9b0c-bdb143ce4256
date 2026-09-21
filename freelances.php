@@ -9,7 +9,7 @@ require_once __DIR__ . '/includes/header.php';
     <span class="eyebrow">Offre freelance</span>
     <h1 class="mt-2">Des missions qualifiées,<br>sans prospection.</h1>
     <p class="lead mt-3" style="margin:16px auto 0">
-      Vous recevez uniquement des missions correspondant à vos compétences, votre TJM et votre disponibilité.
+      Vous recevez uniquement des missions correspondant à vos compétences, votre tarif et votre disponibilité.
       Le reste — cadrage, relation client, facturation — est géré par notre équipe.
     </p>
     <div class="hero-actions" style="justify-content:center">
@@ -57,7 +57,7 @@ require_once __DIR__ . '/includes/header.php';
         <?php
         $c = [
           ['Correspondance des compétences', 40, 'Recoupement entre les compétences demandées et celles déclarées sur votre profil.'],
-          ['Adéquation budgétaire', 25, 'Compatibilité entre votre TJM et le budget alloué au projet.'],
+          ['Adéquation budgétaire', 25, 'Compatibilité entre votre tarif par projet et le budget alloué.'],
           ['Disponibilité', 15, 'Votre statut déclaré : disponible, partiellement disponible ou occupé.'],
           ['Années d\'expérience', 10, 'Expérience professionnelle sur le domaine concerné.'],
           ['Note moyenne', 10, 'Moyenne des évaluations obtenues sur vos missions précédentes.'],
@@ -86,7 +86,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="grid" style="gap:16px">
       <?php
       $st = [
-        ["Créez votre profil","Compétences, TJM, disponibilité et expériences clés. Comptez 10 minutes."],
+        ["Créez votre profil","Compétences, tarif par projet, disponibilité et expériences clés. Comptez 10 minutes."],
         ["Validation par notre équipe","Nous vérifions vos références et votre positionnement. Réponse sous 5 jours ouvrés."],
         ["Recevez vos premières missions","Dès qu'un projet correspond à votre profil, vous recevez une proposition détaillée."],
         ["Livrez et développez votre score","Chaque mission bien menée améliore votre classement et la qualité des propositions."],

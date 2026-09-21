@@ -5,7 +5,7 @@ $u = user();
 $id = (int)($_GET['id'] ?? 0);
 
 $st = db()->prepare("SELECT p.*, e.societe, e.nom AS e_nom, e.prenom AS e_prenom,
-                            f.nom AS f_nom, f.prenom AS f_prenom, f.titre_pro, f.note_moyenne, f.tjm
+                            f.nom AS f_nom, f.prenom AS f_prenom, f.titre_pro, f.note_moyenne, f.tarif_projet
                      FROM projets p
                      LEFT JOIN users e ON e.id = p.entreprise_id
                      LEFT JOIN users f ON f.id = p.freelance_id

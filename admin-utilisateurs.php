@@ -59,7 +59,7 @@ require_once __DIR__ . '/includes/header.php';
               <?php if (est_client($x['role'])): ?>
                 <?= e($x['societe'] ?: role_label($x['role'])) ?><br><span class="muted"><?= e(trim($x['taille'])) ?: '—' ?></span>
               <?php elseif ($x['role']==='freelance'): ?>
-                <?= e($x['titre_pro']) ?><br><span class="muted">TJM <?= euros($x['tjm']) ?> · <?= (int)$x['experience'] ?> ans · <?= ucfirst($x['disponibilite']) ?></span>
+                <?= e($x['titre_pro']) ?><br><span class="muted">Tarif <?= euros($x['tarif_projet']) ?> · <?= (int)$x['experience'] ?> ans · <?= ucfirst($x['disponibilite']) ?></span>
               <?php else: ?><span class="muted">Équipe WorkConnects</span><?php endif; ?>
             </td>
             <td class="small">

@@ -72,7 +72,7 @@ require_once __DIR__ . '/includes/header.php';
                     <?= e($f['prenom'].' '.$f['nom']) ?>
                     <?php if ($i===0): ?><span class="badge badge-green" style="margin-left:6px">Recommandé</span><?php endif; ?>
                   </h4>
-                  <p class="small muted"><?= e($f['titre_pro']) ?> · TJM <?= euros($f['tjm']) ?> · <?= (int)$f['experience'] ?> ans ·
+                  <p class="small muted"><?= e($f['titre_pro']) ?> · Tarif <?= euros($f['tarif_projet']) ?> · <?= (int)$f['experience'] ?> ans ·
                     <span class="stars"><?= str_repeat('★',(int)round($f['note_moyenne'])) ?></span>
                     <?= number_format($f['note_moyenne'],1,',','') ?>/5
                   </p>

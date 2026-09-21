@@ -61,7 +61,7 @@ $titre = $titre ?? 'WorkConnects';
         <a href="deconnexion.php" class="btn btn-ghost btn-sm">Déconnexion</a>
       <?php else: ?>
         <a href="connexion.php" class="btn btn-ghost">Connexion</a>
-        <a href="inscription.php" class="btn btn-primary">Démarrer un projet</a>
+        <a href="inscription.php" class="btn btn-primary">Inscription</a>
       <?php endif; ?>
       <button class="burger" onclick="document.getElementById('nav').classList.toggle('open')" aria-label="Menu">
         <span></span><span></span><span></span>

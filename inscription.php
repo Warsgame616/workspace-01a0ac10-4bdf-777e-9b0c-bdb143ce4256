@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $erreur = "Un compte existe déjà avec cette adresse e-mail.";
         } else {
             db()->prepare("INSERT INTO users
-                (email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,titre_pro,bio,competences,tjm,experience,disponibilite)
+                (email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,titre_pro,bio,competences,tarif_projet,experience,disponibilite)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
               ->execute([
                 $email, password_hash($pass, PASSWORD_DEFAULT), $role, $nom, $prenom,
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 trim($_POST['secteur'] ?? ''), trim($_POST['taille'] ?? ''),
                 trim($_POST['titre_pro'] ?? ''), trim($_POST['bio'] ?? ''),
                 trim($_POST['competences'] ?? ''),
-                (int)($_POST['tjm'] ?? 0), (int)($_POST['experience'] ?? 0),
+                (int)($_POST['tarif_projet'] ?? 0), (int)($_POST['experience'] ?? 0),
                 $_POST['disponibilite'] ?? 'disponible',
               ]);
             $uid = db()->lastInsertId();
@@ -134,8 +134,8 @@ require_once __DIR__ . '/includes/header.php';
         </div>
         <div class="field-row">
           <div class="field">
-            <label for="tjm">Tarif journalier (€ / jour)</label>
-            <input type="number" id="tjm" name="tjm" class="input" min="0" step="10" placeholder="Ex. 250" value="<?= e($_POST['tjm'] ?? '') ?>">
+            <label for="tarif_projet">Tarif par projet (€)</label>
+            <input type="number" id="tarif_projet" name="tarif_projet" class="input" min="0" step="50" placeholder="Ex. 2000" value="<?= e($_POST['tarif_projet'] ?? '') ?>">
             <div class="hint">Ce que vous facturez pour une journée de travail.</div>
           </div>
           <div class="field">

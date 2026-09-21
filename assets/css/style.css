@@ -252,7 +252,7 @@ p{color:var(--ink-2)}
 
 /* ---------- Layout application ---------- */
 .app{display:grid;grid-template-columns:248px 1fr;min-height:calc(100vh - 68px)}
-.sidebar{background:var(--surface);border-right:1px solid var(--line);padding:24px 14px}
+.sidebar{background:var(--surface);border-right:1px solid var(--line);padding:24px 14px;display:flex;flex-direction:column}
 .side-label{font-size:.6875rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted-2);font-weight:700;padding:0 12px;margin:22px 0 8px}
 .side-label:first-child{margin-top:0}
 .side-link{
@@ -592,3 +592,12 @@ tbody tr:hover{background:#FCFDFE}
 
 /* Les accès démo sont des liens : même rendu que les boutons */
 a.demo-btn{text-decoration:none;color:inherit}
+
+/* Bouton secondaire contour (CTA hero) */
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-outline:hover{background:var(--bg-2);border-color:var(--ink-2)}
+
+/* Déconnexion en pied de barre latérale */
+.side-logout{margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}
+.side-logout .side-link{color:var(--muted)}
+.side-logout .side-link:hover{color:#b42318;background:#fef3f2}

@@ -40,7 +40,7 @@ function install_schema(PDO $pdo) {
         titre_pro TEXT DEFAULT '',
         bio TEXT DEFAULT '',
         competences TEXT DEFAULT '',     -- liste séparée par virgules
-        tjm INTEGER DEFAULT 0,
+        tarif_projet INTEGER DEFAULT 0,
         experience INTEGER DEFAULT 0,
         disponibilite TEXT DEFAULT 'disponible',
         note_moyenne REAL DEFAULT 0,
@@ -160,7 +160,7 @@ function param($cle, $defaut = 0) {
  * remplissent avec les vrais comptes, projets et messages.
  */
 function seed_data(PDO $pdo) {
-    $st = $pdo->prepare("INSERT INTO users (email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,titre_pro,bio,competences,tjm,experience,disponibilite,note_moyenne,nb_missions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $st = $pdo->prepare("INSERT INTO users (email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,titre_pro,bio,competences,tarif_projet,experience,disponibilite,note_moyenne,nb_missions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     $st->execute([
         ADMIN_EMAIL,
         password_hash(ADMIN_PASSWORD, PASSWORD_DEFAULT),

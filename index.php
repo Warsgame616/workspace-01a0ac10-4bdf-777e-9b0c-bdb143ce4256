@@ -15,7 +15,8 @@ require_once __DIR__ . '/includes/header.php';
         et vous garantit un livrable conforme, dans les délais.
       </p>
       <div class="hero-actions">
-        <a href="inscription.php" class="btn btn-primary btn-lg">Décrire mon projet</a>
+        <a href="inscription.php?role=entreprise" class="btn btn-primary btn-lg">Décrire mon projet</a>
+        <a href="inscription.php" class="btn btn-outline btn-lg">Inscription</a>
         <a href="entreprises.php" class="btn btn-ghost btn-lg">Comment ça marche</a>
       </div>
       <div class="hero-trust">
@@ -135,7 +136,7 @@ require_once __DIR__ . '/includes/header.php';
     <div class="card">
       <span class="badge badge-gray mb-2">Freelances</span>
       <h3 style="font-size:1.5rem">Des missions qualifiées, sans prospection</h3>
-      <p class="mt-2">Recevez uniquement des missions correspondant à vos compétences et à votre TJM. Le cadrage, la relation client et la facturation sont gérés par nous.</p>
+      <p class="mt-2">Recevez uniquement des missions correspondant à vos compétences et à votre tarif. Le cadrage, la relation client et la facturation sont gérés par nous.</p>
       <ul style="list-style:none;margin:20px 0;display:grid;gap:10px">
         <li>✓ Missions pré-cadrées et pré-vendues</li>
         <li>✓ Zéro prospection commerciale</li>
