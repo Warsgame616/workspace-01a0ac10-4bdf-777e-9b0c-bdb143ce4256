@@ -47,7 +47,5 @@ if ($u = user()) {
   <a href="admin-parametres.php" class="side-link <?= $cur==='admin-parametres.php'?'active':'' ?>"><span class="ico">⚙️</span> Paramètres</a>
 <?php endif; ?>
 
-<div class="side-logout">
-  <a href="deconnexion.php" class="side-link"><span class="ico">⏻</span> Déconnexion</a>
-</div>
+<a href="deconnexion.php" class="side-link side-logout"><span class="ico">⏻</span> Déconnexion</a>
 </aside>
