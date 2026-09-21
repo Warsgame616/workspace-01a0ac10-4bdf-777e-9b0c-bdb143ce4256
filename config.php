@@ -32,5 +32,6 @@ define('SITE_EMAIL',  'contact@workconnects.fr');
 define('SITE_TEL',    '');
 
 // ---- Modèle économique ----
-define('COMMISSION_DEFAUT', 20);   // Commission WorkConnects en %
+define('COMMISSION_DEFAUT', 20);   // Part WorkConnects incluse dans le prix (%)
+define('FRAIS_DOSSIER', 2);        // Frais de validation de la proposition (€)
 define('BUDGET_PLAFOND_CFG', 5000); // Plafond du curseur de budget (€)

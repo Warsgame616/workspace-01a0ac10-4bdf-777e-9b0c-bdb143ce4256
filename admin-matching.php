@@ -16,11 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         db()->prepare("UPDATE projets SET freelance_id=?, statut='attribue', avancement=5 WHERE id=?")->execute([$fid, $id]);
         $fs = db()->prepare("SELECT * FROM users WHERE id=?"); $fs->execute([$fid]); $fl = $fs->fetch();
 
-        // Le tarif du freelance sert de base ; les frais de service s'y ajoutent.
+        // Le tarif du freelance sert de base ; la part WorkConnects est incluse dans le prix client.
         $base = (int) ($fl['tarif_projet'] ?: round(($projet['budget_min'] + $projet['budget_max']) / 2));
         $d    = decomposer_montant($base);
-        creer_paiement($id, 'frais',  $d['frais'], 'a_payer');   // étape 1
-        creer_paiement($id, 'projet', $d['base'],  'a_payer');   // étape 2
+        // Étape 1 : frais de dossier fixes, réglés pour valider la proposition.
+        creer_paiement($id, 'frais',  frais_dossier(), 'a_payer');
+        // Étape 2 : prix du projet, part WorkConnects déjà incluse dans le total.
+        creer_paiement($id, 'projet', $d['total'],     'a_payer');
 
         notify($fid, "Nouvelle mission attribuée : « ".$projet['titre']." ».", 'projet.php?id='.$id);
         notify($projet['entreprise_id'], "Un expert a été sélectionné pour votre projet « ".$projet['titre']." ». Validez la proposition pour lancer la mission.", 'projet.php?id='.$id);

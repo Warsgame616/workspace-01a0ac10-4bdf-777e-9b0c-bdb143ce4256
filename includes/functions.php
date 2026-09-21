@@ -218,15 +218,20 @@ function flash($msg = null, $type = 'success') {
 /** Taux de frais de service en % (paramétrable dans l'admin). */
 function taux_frais() { return (float) param('commission', 20); }
 
+/** Frais de dossier fixes réglés à la validation de la proposition. */
+function frais_dossier() { return defined('FRAIS_DOSSIER') ? (int) FRAIS_DOSSIER : 2; }
+
 /**
  * Décompose un montant de mission.
+ * Le prix annoncé au client inclut déjà la part WorkConnects : le client
+ * ne voit qu'un total, le freelance perçoit sa base intégrale.
  * @param int $base Montant revenant au freelance (son prix).
- * @return array{base:int,frais:int,total:int}
+ * @return array{base:int,part:int,total:int}
  */
 function decomposer_montant($base) {
-    $base  = max(0, (int) $base);
-    $frais = (int) round($base * (taux_frais() / 100));
-    return ['base' => $base, 'frais' => $frais, 'total' => $base + $frais];
+    $base = max(0, (int) $base);
+    $part = (int) round($base * (taux_frais() / 100));
+    return ['base' => $base, 'part' => $part, 'total' => $base + $part];
 }
 
 /** Les deux paiements d'un projet, indexés par type. */
@@ -255,6 +260,8 @@ function creer_paiement($projet_id, $type, $montant, $statut = 'a_payer') {
  * tant que le projet n'est pas terminé.
  */
 function regler_paiement($projet_id, $type) {
+    // Les frais de dossier restent en suspens (remboursables) ; le règlement
+    // du projet, lui, est encaissé définitivement à la livraison.
     $statut = ($type === 'frais') ? 'en_suspens' : 'paye';
     db()->prepare("UPDATE paiements SET statut=?, paye_le=CURRENT_TIMESTAMP, reference=? WHERE projet_id=? AND type=? AND statut='a_payer'")
         ->execute([$statut, strtoupper($type[0]) . '-' . date('Ymd') . '-' . str_pad($projet_id, 4, '0', STR_PAD_LEFT), $projet_id, $type]);

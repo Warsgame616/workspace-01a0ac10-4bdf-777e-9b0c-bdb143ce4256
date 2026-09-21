@@ -86,33 +86,34 @@ Deux éléments à sauvegarder régulièrement :
 
 ## 7. Modèle de paiement
 
-**Les frais de service sont payés par l'entreprise, pas par le freelance.**
+**La part WorkConnects est incluse dans le prix affiché au client.**
 
-Un freelance qui annonce 100 € touche 100 €. L'entreprise règle 120 €
-(avec un taux à 20 %). Le taux n'est affiché nulle part côté client ni
-côté freelance : il n'apparaît que dans le back-office.
+Un freelance qui annonce 2 500 € touche 2 500 €. Le client voit 3 000 €
+dès le départ (avec un taux à 20 %) et ne voit jamais apparaître de
+ligne de commission. Le détail n'existe que dans le back-office.
 
 ### Les deux échéances
 
-| Étape | Quand | Montant | Rôle |
+| Étape | Quand | Montant | Effet |
 |---|---|---|---|
-| 1. Validation | À l'attribution de l'expert | Frais de service | Lance la mission |
-| 2. Règlement | Après validation | Prix de la prestation | Rémunère l'expert |
+| 1. Validation | À l'attribution de l'expert | 2 € de frais de dossier | Lance la mission |
+| 2. Règlement | **À la livraison du livrable** | Prix total (part WC incluse) | Clôture le projet |
 
-Les frais de l'étape 1 restent **en suspens** pendant toute la durée du
-projet :
+Le règlement de l'étape 2 est **verrouillé** tant que le projet n'est
+pas passé au statut « Terminé ».
+
+Les 2 € restent **en suspens** pendant toute la durée du projet :
 
 - projet livré → statut `libere`, les frais sont acquis
-- projet annulé → statut `rembourse`, les frais sont rendus au client
+- projet annulé → statut `rembourse`, les 2 € sont rendus au client
 
-### Modifier le taux
+### Régler les montants
 
-Back-office → Paramètres → Commission. La valeur s'applique aux
-nouvelles attributions ; les projets en cours conservent leur montant.
+- Taux WorkConnects : Back-office → Paramètres → Commission
+- Frais de dossier : `FRAIS_DOSSIER` dans `config.php` (2 € par défaut)
 
 ### Raccordement à un prestataire de paiement
 
 Les règlements sont enregistrés en base mais aucun flux bancaire n'est
-déclenché. Pour encaisser réellement, il faut brancher un prestataire
-(Stripe Connect est adapté à ce modèle à trois parties) sur la fonction
-`regler_paiement()` dans `includes/functions.php`.
+déclenché. Pour encaisser réellement, brancher le prestataire sur la
+fonction `regler_paiement()` dans `includes/functions.php`.

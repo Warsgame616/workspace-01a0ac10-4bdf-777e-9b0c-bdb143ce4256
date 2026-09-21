@@ -88,6 +88,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_paiement'])) {
         header('Location: ' . u('projet.php?id=' . $id)); exit;
     }
     $type = $_POST['type_paiement'] ?? '';
+    // Le règlement du projet n'est ouvert qu'une fois le livrable remis.
+    if ($type === 'projet' && $p['statut'] !== 'termine') {
+        flash("Le règlement sera disponible à la livraison du projet.");
+        header('Location: ' . u('projet.php?id=' . $id)); exit;
+    }
     if (in_array($type, ['frais','projet'], true)) {
         regler_paiement($id, $type);
         if ($type === 'frais') {
@@ -110,11 +115,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $u['role']==='admin' && isset($_POST[
     if ($_POST['statut']==='termine') {
         // Le montant saisi est ce que perçoit l'expert ; les frais s'y ajoutent.
         $d = decomposer_montant((int)$_POST['montant_final']);
-        liberer_frais($id);   // prestation livrée : frais acquis, plus remboursables
+        liberer_frais($id);   // livraison : les frais de dossier sont acquis
         $ex = db()->prepare("SELECT COUNT(*) FROM factures WHERE projet_id=?"); $ex->execute([$id]);
         if (!$ex->fetchColumn()) {
             db()->prepare("INSERT INTO factures (projet_id,numero,montant_ht,commission,montant_freelance,statut) VALUES (?,?,?,?,?,'en_attente')")
-                ->execute([$id, 'FA-'.date('Y').'-'.str_pad($id,4,'0',STR_PAD_LEFT), $d['total'], $d['frais'], $d['base']]);
+                ->execute([$id, 'FA-'.date('Y').'-'.str_pad($id,4,'0',STR_PAD_LEFT), $d['total'], $d['part'], $d['base']]);
         }
     }
     if ($_POST['statut']==='annule') { rembourser_frais($id); }
@@ -380,7 +385,7 @@ require_once __DIR__ . '/includes/header.php';
               <div class="pay-num">1</div>
               <div class="pay-body">
                 <h4>Valider la proposition</h4>
-                <p class="small muted">Frais de service à régler pour lancer la mission. Ce montant est conservé jusqu'à la livraison et vous est remboursé si le projet est annulé.</p>
+                <p class="small muted">Frais de dossier à régler pour lancer la mission. Ce montant est conservé jusqu'à la livraison et vous est remboursé en cas d'annulation.</p>
                 <div class="pay-amount"><?= euros($pf['montant']) ?></div>
                 <form method="post" class="mt-1">
                   <?= csrf_field() ?>
@@ -406,12 +411,12 @@ require_once __DIR__ . '/includes/header.php';
           <?php endif; ?>
 
           <?php if ($pp): ?>
-            <?php if ($pp['statut'] === 'a_payer' && $pf && $pf['statut'] !== 'a_payer'): ?>
+            <?php if ($pp['statut'] === 'a_payer' && $pf && $pf['statut'] !== 'a_payer' && $p['statut'] === 'termine'): ?>
               <div class="pay-step">
                 <div class="pay-num">2</div>
                 <div class="pay-body">
                   <h4>Régler le projet</h4>
-                  <p class="small muted">Montant de la prestation.</p>
+                  <p class="small muted">Le livrable a été remis. Montant total de la prestation.</p>
                   <div class="pay-amount"><?= euros($pp['montant']) ?></div>
                   <form method="post" class="mt-1">
                     <?= csrf_field() ?>
@@ -434,7 +439,11 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="pay-num">2</div>
                 <div class="pay-body">
                   <h4>Règlement du projet</h4>
-                  <p class="small muted">Disponible après validation de la proposition.</p>
+                  <p class="small muted">
+                    <?= ($pf && $pf['statut']==='a_payer')
+                        ? 'Disponible après validation de la proposition.'
+                        : 'À régler à la livraison du livrable — ' . euros($pp['montant']) . '.' ?>
+                  </p>
                 </div>
               </div>
             <?php endif; ?>
