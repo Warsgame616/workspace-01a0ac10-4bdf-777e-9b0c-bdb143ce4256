@@ -425,7 +425,9 @@ tbody tr:hover{background:#FCFDFE}
   }
   .nav.open{display:flex}
   .burger{display:block}
-  .header-cta .btn-ghost{display:none}
+  /* Connexion reste accessible sur mobile : on le compacte au lieu de le cacher */
+  .header-cta .btn-ghost{padding:9px 12px;font-size:.8125rem}
+  .header-cta .btn-primary{padding:9px 14px;font-size:.8125rem}
   .section{padding:56px 0}
   .grid-2,.grid-3,.grid-4,.steps,.field-row,.role-grid{grid-template-columns:1fr}
   .app{grid-template-columns:1fr}
@@ -435,6 +437,7 @@ tbody tr:hover{background:#FCFDFE}
   }
   .side-label{display:none}
   .side-link{white-space:nowrap;margin-bottom:0;padding:8px 13px;font-size:.875rem}
+  .side-logout{margin-top:0;padding-top:0;border-top:0;display:flex;align-items:center}
   .main{padding:20px 16px}
   .chat{grid-template-columns:1fr;height:auto}
   .chat-list{max-height:210px;border-right:0;border-bottom:1px solid var(--line)}
@@ -444,6 +447,9 @@ tbody tr:hover{background:#FCFDFE}
   .wz-step .t{display:none}
   .hero-trust{gap:22px}
   .container,.container-sm{padding:0 16px}
+  /* Les 4 boutons du hero ne tiennent pas sur une ligne : on les empile */
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .hero-actions .btn{width:100%}
   thead th,tbody td{padding:11px 14px}
   .auth-card{padding:26px 20px}
 }
