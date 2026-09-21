@@ -1,0 +1,144 @@
+══════════════════════════════════════════════════════════════
+  WORKCONNECTS — INSTALLATION SUR HOSTINGER
+══════════════════════════════════════════════════════════════
+
+Temps estimé : 10 minutes. Aucune base de données à créer.
+
+
+───────────────────────────────────────────────
+ÉTAPE 1 — MODIFIER LE MOT DE PASSE ADMINISTRATEUR
+───────────────────────────────────────────────
+
+⚠️ À FAIRE AVANT D'ENVOYER LES FICHIERS.
+
+Ouvrez config.php dans un éditeur de texte et modifiez :
+
+    define('ADMIN_EMAIL',    'votre@email.fr');
+    define('ADMIN_PASSWORD', 'VotreMotDePasseSolide');
+
+Désactivez aussi les comptes de démonstration :
+
+    define('COMPTES_TEST', false);
+
+Ces valeurs créent le compte administrateur au tout premier
+chargement du site. Après coup, elles n'ont plus d'effet.
+
+
+───────────────────────────────────────────────
+ÉTAPE 2 — ENVOYER LES FICHIERS
+───────────────────────────────────────────────
+
+Dans hPanel Hostinger :
+
+  1. Fichiers  →  Gestionnaire de fichiers
+  2. Ouvrez le dossier  public_html
+  3. Videz-le s'il contient une page par défaut
+  4. Bouton « Importer »  →  envoyez workconnects-hostinger.zip
+  5. Clic droit sur l'archive  →  « Extraire »
+  6. Supprimez l'archive une fois extraite
+
+Vérifiez que index.php se trouve bien à la racine de
+public_html, et NON dans un sous-dossier.
+
+
+───────────────────────────────────────────────
+ÉTAPE 3 — DROITS D'ÉCRITURE
+───────────────────────────────────────────────
+
+Deux dossiers doivent être inscriptibles :
+
+    data/       →  755   (base de données)
+    uploads/    →  755   (fichiers et portfolios)
+
+Dans le gestionnaire de fichiers : clic droit sur le dossier
+→ Permissions → 755 → cocher « Appliquer aux sous-dossiers ».
+
+Si le site affiche une erreur d'écriture, passez data/ en 777,
+puis remettez 755 une fois la base créée.
+
+
+───────────────────────────────────────────────
+ÉTAPE 4 — VERSION DE PHP
+───────────────────────────────────────────────
+
+hPanel  →  Avancé  →  Configuration PHP
+
+  • Version : PHP 8.0 ou supérieur
+  • Onglet « Extensions PHP » : cochez  pdo_sqlite  et  mbstring
+
+Ces deux extensions sont actives par défaut chez Hostinger.
+
+
+───────────────────────────────────────────────
+ÉTAPE 5 — PREMIER CHARGEMENT
+───────────────────────────────────────────────
+
+Ouvrez votre domaine dans le navigateur.
+
+La base de données se crée automatiquement, avec votre compte
+administrateur. Connectez-vous avec les identifiants définis
+à l'étape 1.
+
+Page de diagnostic si quelque chose cloche :
+
+    votredomaine.fr/check.php
+
+Elle indique la version de PHP, les extensions présentes et
+les droits sur les dossiers. SUPPRIMEZ-LA ensuite.
+
+
+───────────────────────────────────────────────
+ÉTAPE 6 — HTTPS
+───────────────────────────────────────────────
+
+hPanel  →  Sécurité  →  SSL  →  activer le certificat gratuit,
+puis « Forcer HTTPS ».
+
+Important : les sessions sont configurées pour HTTPS. Le site
+fonctionne en HTTP, mais activez SSL dès que possible.
+
+
+───────────────────────────────────────────────
+APRÈS L'INSTALLATION
+───────────────────────────────────────────────
+
+□ Supprimer check.php
+□ Vérifier que votredomaine.fr/data/ renvoie une erreur 403
+□ Régler la commission et les coefficients de matching dans
+  Back-office → Paramètres
+□ Compléter les mentions légales (mentions.php) avec votre
+  raison sociale, SIRET et adresse
+
+
+───────────────────────────────────────────────
+SAUVEGARDE
+───────────────────────────────────────────────
+
+Deux éléments contiennent toutes vos données :
+
+    data/workconnects.sqlite   →  comptes, projets, messages
+    uploads/                   →  fichiers livrés, portfolios
+
+Téléchargez-les régulièrement. Hostinger propose aussi des
+sauvegardes automatiques dans hPanel → Fichiers → Sauvegardes.
+
+
+───────────────────────────────────────────────
+EN CAS DE PROBLÈME
+───────────────────────────────────────────────
+
+Page blanche
+    → hPanel → Avancé → Configuration PHP → activer
+      display_errors temporairement pour voir le message.
+
+Erreur « unable to open database file »
+    → droits insuffisants sur data/. Passez le dossier en 777.
+
+Le site affiche du code PHP au lieu de la page
+    → mauvaise version de PHP sélectionnée, ou fichiers
+      déposés hors de public_html.
+
+Erreur 500
+    → renommez .htaccess en .htaccess.bak et rechargez.
+      Si le site remonte, votre hébergement ne supporte pas
+      une directive du fichier.
