@@ -77,7 +77,7 @@ require_once __DIR__ . '/includes/header.php';
   <div class="container">
     <div class="section-head"><h2>Ce que vous y gagnez</h2></div>
     <div class="grid grid-4">
-      <div class="stat"><div class="lbl">Temps de sélection</div><div class="val">−90 %</div><div class="sub">vs recherche interne</div></div>
+      <div class="stat"><div class="lbl">Recherche de prestataire</div><div class="val">0</div><div class="sub">nous nous en chargeons</div></div>
       <div class="stat"><div class="lbl">Délai de proposition</div><div class="val">48 h</div><div class="sub">profil + devis</div></div>
       <div class="stat"><div class="lbl">Interlocuteurs</div><div class="val">1</div><div class="sub">quel que soit le projet</div></div>
       <div class="stat accent"><div class="lbl">Projets pilotés</div><div class="val">100 %</div><div class="sub">aucun projet laissé seul</div></div>

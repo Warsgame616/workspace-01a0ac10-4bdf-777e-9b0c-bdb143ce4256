@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               ]);
             $uid = db()->lastInsertId();
             notify($uid, "Bienvenue sur WorkConnects. Votre chargé de compte vous contactera sous 48 h.", 'index.php');
-            notify(1, "Nouvelle inscription : " . $nom . " (" . $role . ").", 'admin.php');
+            notify(admin_id(), "Nouvelle inscription : " . $nom . " (" . $role . ").", 'admin.php');
             header('Location: connexion.php?inscrit=1'); exit;
         }
     }

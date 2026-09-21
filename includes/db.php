@@ -1,6 +1,8 @@
 <?php
 // WorkConnects - Connexion base de données SQLite (PHP pur, aucune API externe)
 
+require_once __DIR__ . '/../config.php';
+
 define('DB_FILE', __DIR__ . '/../data/workconnects.sqlite');
 define('COMMISSION_RATE', 0.20); // Commission WorkConnects par défaut : 20%
 
@@ -151,52 +153,18 @@ function param($cle, $defaut = 0) {
     return $r === false ? $defaut : $r;
 }
 
+/**
+ * Amorçage d'une installation neuve.
+ * Crée UNIQUEMENT le compte administrateur WorkConnects.
+ * Aucune donnée fictive : les tableaux de bord démarrent à zéro et se
+ * remplissent avec les vrais comptes, projets et messages.
+ */
 function seed_data(PDO $pdo) {
-    $h = fn($p) => password_hash($p, PASSWORD_DEFAULT);
-
-    $users = [
-        ['admin@workconnects.fr', $h('admin123'), 'admin', 'Dupont', 'Sophie', '0600000000', 'WorkConnects', '', '', '', 'Responsable de compte', '', '', 0, 0, 'disponible', 0, 0],
-        ['entreprise@test.fr', $h('test123'), 'entreprise', 'Martin', 'Julien', '0611223344', 'Nexora Industries', '81234567800021', 'Industrie', '50-200', '', 'PME industrielle en transformation numérique.', '', 0, 0, '', 0, 0],
-        ['contact@luminatech.fr', $h('test123'), 'entreprise', 'Bernard', 'Claire', '0622334455', 'LuminaTech', '81234567800039', 'SaaS', '10-50', '', 'Éditeur de logiciels B2B.', '', 0, 0, '', 0, 0],
-        ['marie@freelance.fr', $h('test123'), 'freelance', 'Leroy', 'Marie', '0633445566', '', '', '', '', 'Développeuse Full-Stack', 'Développeuse web avec 8 ans d\'expérience sur des projets B2B exigeants.', 'PHP,JavaScript,React,MySQL,API REST', 120, 8, 'disponible', 4.8, 23],
-        ['thomas@freelance.fr', $h('test123'), 'freelance', 'Moreau', 'Thomas', '0644556677', '', '', '', '', 'Designer UI/UX', 'Designer produit spécialisé interfaces B2B et design systems.', 'Figma,UI Design,UX Research,Design System,Webflow', 110, 6, 'disponible', 4.6, 17],
-        ['sarah@freelance.fr', $h('test123'), 'freelance', 'Benali', 'Sarah', '0655667788', '', '', '', '', 'Consultante SEO & Contenu', 'Stratégie de contenu et référencement naturel pour le B2B.', 'SEO,Rédaction,Analytics,Content Strategy', 95, 5, 'occupe', 4.9, 31],
-        ['karim@freelance.fr', $h('test123'), 'freelance', 'Haddad', 'Karim', '0666778899', '', '', '', '', 'Développeur Mobile', 'Applications iOS et Android natives et cross-platform.', 'Flutter,Swift,Kotlin,Firebase,API REST', 140, 7, 'disponible', 4.7, 14],
-    ];
     $st = $pdo->prepare("INSERT INTO users (email,password_hash,role,nom,prenom,telephone,societe,siret,secteur,taille,titre_pro,bio,competences,tjm,experience,disponibilite,note_moyenne,nb_missions) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-    foreach ($users as $u) { $st->execute($u); }
-
-    $projets = [
-        [2, 4, 'Refonte du site vitrine corporate', 'Développement Web', "Refonte complète de notre site vitrine avec un design premium, optimisation des performances et intégration d'un back-office simple pour l'équipe marketing.", 'PHP,JavaScript,SEO', 2500, 4000, '2 mois', '2026-11-15', 'en_cours', 65, 3600],
-        [2, null, 'Application mobile de suivi de production', 'Développement Mobile', "Application interne permettant aux chefs d'atelier de suivre la production en temps réel, avec mode hors-ligne et synchronisation.", 'Flutter,API REST,Firebase', 3500, 5000, '4 mois', '2027-01-30', 'analyse', 0, 0],
-        [3, 5, 'Design system et refonte UI du produit SaaS', 'Design UI/UX', "Création d'un design system complet et refonte des écrans principaux de notre plateforme SaaS B2B.", 'Figma,Design System,UI Design', 2800, 4500, '3 mois', '2026-12-20', 'en_cours', 40, 4200],
-        [3, 6, 'Stratégie SEO et contenu 2026', 'Marketing Digital', "Audit SEO complet, définition d'une stratégie de contenu sur 12 mois et production des premiers articles piliers.", 'SEO,Rédaction,Analytics', 1500, 2800, '6 mois', '2027-03-01', 'termine', 100, 2400],
-        [2, null, "Automatisation des rapports financiers", 'Data & Automatisation', "Mise en place de tableaux de bord automatisés consolidant les données de nos différents outils de gestion.", 'Python,SQL,Data Viz', 1200, 2500, '2 mois', '2026-12-10', 'nouveau', 0, 0],
-    ];
-    $st = $pdo->prepare("INSERT INTO projets (entreprise_id,freelance_id,titre,categorie,description,competences,budget_min,budget_max,delai,date_limite,statut,avancement,montant_final) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
-    foreach ($projets as $p) { $st->execute($p); }
-
-    $messages = [
-        [1, 2, 1, "Bonjour, où en est l'avancement de la refonte du site ?", 1],
-        [1, 1, 2, "Bonjour Julien, le projet avance très bien, nous sommes à 65%. La maquette finale a été validée et l'intégration est en cours. Livraison prévue dans les délais.", 1],
-        [1, 4, 1, "L'intégration des pages principales est terminée, je passe sur le back-office cette semaine.", 1],
-        [3, 3, 1, "Pouvons-nous ajouter un écran supplémentaire au design system ?", 0],
-        [2, 1, 2, "Nous avons identifié 3 profils correspondant à votre projet d'application mobile. Nous revenons vers vous sous 48h avec notre recommandation.", 0],
-    ];
-    $st = $pdo->prepare("INSERT INTO messages (projet_id,expediteur_id,destinataire_id,contenu,lu) VALUES (?,?,?,?,?)");
-    foreach ($messages as $m) { $st->execute($m); }
-
-    $notifs = [
-        [2, "Votre projet « Refonte du site vitrine corporate » est passé à 65% d'avancement.", 'projet.php?id=1'],
-        [2, "Nouveau message de votre chargé de compte WorkConnects.", 'messages.php'],
-        [4, "Nouvelle mission attribuée : Refonte du site vitrine corporate.", 'projet.php?id=1'],
-        [1, "Nouveau projet à analyser : Automatisation des rapports financiers.", 'admin.php'],
-    ];
-    $st = $pdo->prepare("INSERT INTO notifications (user_id,texte,lien) VALUES (?,?,?)");
-    foreach ($notifs as $n) { $st->execute($n); }
-
-    $pdo->prepare("INSERT INTO factures (projet_id,numero,montant_ht,commission,montant_freelance,statut) VALUES (?,?,?,?,?,?)")
-        ->execute([4, 'FA-2026-0041', 2400, 480, 1920, 'payee']);
-    $pdo->prepare("INSERT INTO evaluations (projet_id,auteur_id,cible_id,note,commentaire) VALUES (?,?,?,?,?)")
-        ->execute([4, 3, 6, 5, "Travail remarquable, résultats mesurables dès le troisième mois."]);
+    $st->execute([
+        ADMIN_EMAIL,
+        password_hash(ADMIN_PASSWORD, PASSWORD_DEFAULT),
+        'admin', 'Administrateur', 'WorkConnects', '', 'WorkConnects', '', '', '',
+        'Responsable de compte', '', '', 0, 0, '', 0, 0,
+    ]);
 }

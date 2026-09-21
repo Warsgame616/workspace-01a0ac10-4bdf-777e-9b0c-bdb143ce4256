@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        trim($_POST['delai'] ?? ''), trim($_POST['date_limite'] ?? '')]);
         $pid = db()->lastInsertId();
         notify($u['id'], "Votre projet « $t » a bien été enregistré. Réponse sous 48 h.", 'projet.php?id='.$pid);
-        notify(1, "Nouveau projet à analyser : « $t » (".($u['societe'] ?: $u['nom']).").", 'admin-matching.php?id='.$pid);
+        notify(admin_id(), "Nouveau projet à analyser : « $t » (".($u['societe'] ?: $u['nom']).").", 'admin-matching.php?id='.$pid);
         db()->prepare("INSERT INTO messages (projet_id,expediteur_id,destinataire_id,contenu) VALUES (?,1,?,?)")
             ->execute([$pid, $u['id'],
               "Bonjour, nous avons bien reçu votre projet « $t ». Notre équipe analyse votre besoin et revient vers vous sous 48 heures avec une proposition d'expert et une estimation budgétaire."]);

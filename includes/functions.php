@@ -181,7 +181,16 @@ function flash($msg = null, $type = 'success') {
     return null;
 }
 
+/** Identifiant du compte administrateur (robuste même après suppression du n°1). */
+function admin_id() {
+    static $id = null;
+    if ($id !== null) return $id;
+    $id = (int) db()->query("SELECT id FROM users WHERE role='admin' ORDER BY id LIMIT 1")->fetchColumn();
+    return $id ?: 0;
+}
+
 function notify($user_id, $texte, $lien = '') {
+    if (!$user_id) { return; }   // destinataire inconnu : on n'enregistre rien
     db()->prepare("INSERT INTO notifications (user_id,texte,lien) VALUES (?,?,?)")->execute([$user_id, $texte, $lien]);
 }
 function notifications($user_id, $limit = 10) {

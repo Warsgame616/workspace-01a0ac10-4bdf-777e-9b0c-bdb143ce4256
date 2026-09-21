@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['form_eval'])) {
             $moy = $nb_av > 0 ? round((($moy_av * $nb_av) + $note) / ($nb_av + 1), 2) : (float)$note;
             db()->prepare("UPDATE users SET note_moyenne=?, nb_missions=nb_missions+1 WHERE id=?")
                 ->execute([$moy, $p['freelance_id']]);
-            notify(1, "Nouvelle évaluation (".$note."/5) sur « ".$p['titre']." ».", 'projet.php?id='.$id);
+            notify(admin_id(), "Nouvelle évaluation (".$note."/5) sur « ".$p['titre']." ».", 'projet.php?id='.$id);
             flash("Merci, votre évaluation a bien été enregistrée.");
         }
     }
